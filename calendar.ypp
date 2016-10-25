@@ -1,0 +1,70 @@
+%{
+#include <iostream>
+#include <stdio.h>
+#include <string>
+#include <cstdlib>
+using namespace std;
+
+extern FILE *yyin;
+int yylex(); 
+int yyerror(const char *p) { cerr << "Error!" << endl; return 0; }
+%}
+
+//-- SYMBOL SEMANTIC VALUES -----------------------------
+%union {
+  int val;
+};
+%token <val> Program ID identifier calendar_id api_key event_id declare calendario user_id permission crear consultar modificar eliminar evento nombre descripcion inicio fin zona recordatorio fecha invitados lugar archivo READ WRITE STRING ZONA HORA FECHA FLOAT MAIL LLAVEABRE LLAVECIERRA IGUAL COMILLAS DOSPUNTOS PUNTOCOMA COMA 
+%type  <val> PROGRAM PERMISSION SETUP CALENDARID EVENTID TIEMPO EVENTO EVENTOBUSQUEDA CALENDARIO PARAMETROSN PARAMETROSO PARAMETROSCALENDARIO CONSULTAR MODIFICAR ELIMINAR CREAR FUNCIONES
+//-- GRAMMAR RULES ---------------------------------------
+%%
+ PROGRAM: Program ID LLAVEABRE SETUP FUNCIONES LLAVECIERRA {}
+ PERMISSION: READ {}
+              | READ COMA WRITE {}
+ SETUP:  declare user_id IGUAL STRING PUNTOCOMA
+          declare api_key IGUAL STRING PUNTOCOMA
+           declare permission IGUAL COMILLAS  PERMISSION  COMILLAS PUNTOCOMA {}
+ CALENDARID:  identifier DOSPUNTOS STRING PUNTOCOMA {}
+              | {}
+ EVENTID:  identifier DOSPUNTOS STRING PUNTOCOMA {}
+ TIEMPO:  FECHA|FECHA HORA {}
+ REGLAMAIL:  COMILLAS MAIL COMILLAS COMA  REGLAMAIL {}
+        | COMILLAS MAIL COMILLAS {}
+ EVENTO:  evento LLAVEABRE  CALENDARID   PARAMETROSN   PARAMETROSO  LLAVECIERRA {}
+ EVENTOBUSQUEDA:  evento LLAVEABRE  CALENDARID   PARAMETROSN  LLAVECIERRA {}
+ CALENDARIO:  calendario LLAVEABRE  PARAMETROSCALENDARIO  LLAVECIERRA {}
+ PARAMETROSN:	nombre DOSPUNTOS STRING PUNTOCOMA
+	             descripcion DOSPUNTOS STRING PUNTOCOMA
+	             inicio DOSPUNTOS COMILLAS TIEMPO COMILLAS PUNTOCOMA
+	             fin DOSPUNTOS COMILLAS TIEMPO COMILLAS PUNTOCOMA
+	             recordatorio DOSPUNTOS COMILLAS FLOAT COMILLAS PUNTOCOMA {}
+ PARAMETROSO:  lugar DOSPUNTOS STRING PUNTOCOMA  PARAMETROSO {}
+                |archivo DOSPUNTOS STRING PUNTOCOMA  PARAMETROSO {}
+                |invitados DOSPUNTOS REGLAMAIL PUNTOCOMA  PARAMETROSO {}
+                |zona DOSPUNTOS COMILLAS ZONA COMILLAS PUNTOCOMA  PARAMETROSO {}
+                | {}
+ PARAMETROSCALENDARIO:  nombre DOSPUNTOS STRING PUNTOCOMA descripcion DOSPUNTOS STRING PUNTOCOMA {}
+                        |nombre DOSPUNTOS STRING PUNTOCOMA {}
+ CONSULTAR:  consultar  EVENTOBUSQUEDA  {}
+ MODIFICAR:  modificar  EVENTO {}
+ ELIMINAR:  eliminar evento LLAVEABRE  CALENDARID   EVENTID  LLAVECIERRA {}
+ CREAR: crear  EVENTO  {}
+        | crear  CALENDARIO {}
+ FUNCIONES:   CREAR   FUNCIONES  {}
+              | CONSULTAR   FUNCIONES  {}
+              | MODIFICAR   FUNCIONES {}
+              | ELIMINAR   FUNCIONES {}
+              | {}
+%%
+//-- FUNCTION DEFINITIONS ---------------------------------
+int main( int argc, char **argv )
+{
+    ++argv, --argc;     /* skip over program name */
+    if ( argc > 0 )
+       yyin = fopen( argv[0], "r" );
+    else
+       yyin = stdin;
+ 
+  yyparse();
+  return 0;
+}
