@@ -18,43 +18,139 @@ int yyerror(const char *p) { cerr << "Error!" << endl; return 0; }
 %type  <val> PROGRAM PERMISSION SETUP CALENDARID EVENTID TIEMPO EVENTO EVENTOBUSQUEDA CALENDARIO PARAMETROSN PARAMETROSO PARAMETROSCALENDARIO CONSULTAR MODIFICAR ELIMINAR CREAR FUNCIONES
 //-- GRAMMAR RULES ---------------------------------------
 %%
- PROGRAM: Program ID LLAVEABRE SETUP FUNCIONES LLAVECIERRA {}
- PERMISSION: READ {}
-              | READ COMA WRITE {}
+ PROGRAM: Program ID LLAVEABRE SETUP FUNCIONES LLAVECIERRA 
+  {
+    std::cout << "Program->Program ID {setup funciones}"<<std::endl;
+  }
+ PERMISSION: READ 
+              {
+                std::cout << "Read permission"<<std::endl;
+              }
+              | READ COMA WRITE 
+              {
+                std::cout << "Read, write permission"<<std::endl;
+              }
  SETUP:  declare user_id IGUAL STRING PUNTOCOMA
           declare api_key IGUAL STRING PUNTOCOMA
-           declare permission IGUAL COMILLAS  PERMISSION  COMILLAS PUNTOCOMA {}
- CALENDARID:  identifier DOSPUNTOS STRING PUNTOCOMA {}
-              | {}
- EVENTID:  identifier DOSPUNTOS STRING PUNTOCOMA {}
- TIEMPO:  FECHA|FECHA HORA {}
- REGLAMAIL:  COMILLAS MAIL COMILLAS COMA  REGLAMAIL {}
-        | COMILLAS MAIL COMILLAS {}
- EVENTO:  evento LLAVEABRE  CALENDARID   PARAMETROSN   PARAMETROSO  LLAVECIERRA {}
- EVENTOBUSQUEDA:  evento LLAVEABRE  CALENDARID   PARAMETROSN  LLAVECIERRA {}
- CALENDARIO:  calendario LLAVEABRE  PARAMETROSCALENDARIO  LLAVECIERRA {}
+           declare permission IGUAL COMILLAS  PERMISSION  COMILLAS PUNTOCOMA
+            {
+              std::cout << "Declare Setup"<<std::endl;
+            }
+ CALENDARID:  identifier DOSPUNTOS STRING PUNTOCOMA
+              {
+                std::cout << "CalendarId"<<std::endl;
+              }
+              | {
+                  std::cout << "Empty CalendarId"<<std::endl;
+                }
+ EVENTID:  identifier DOSPUNTOS STRING PUNTOCOMA
+            {
+              std::cout << "EventId"<<std::endl;
+            }
+ TIEMPO:  FECHA
+          {
+            std::cout << "Fecha"<<std::endl;
+          }
+          |FECHA HORA
+          {
+              std::cout << "Fecha Hora"<<std::endl;
+          }
+ REGLAMAIL:  COMILLAS MAIL COMILLAS COMA  REGLAMAIL
+            {
+              std::cout << "Mail repetido"<<std::endl;
+            }
+            | COMILLAS MAIL COMILLAS
+            {
+              std::cout << "Mail"<<std::endl;
+            }
+ EVENTO:  evento LLAVEABRE  CALENDARID   PARAMETROSN   PARAMETROSO  LLAVECIERRA
+          {
+              std::cout << "Evento"<<std::endl;
+          }
+ EVENTOBUSQUEDA:  evento LLAVEABRE  CALENDARID   PARAMETROSN  LLAVECIERRA
+                  {
+                    std::cout << "Evento Búsqueda"<<std::endl;
+                  }
+ CALENDARIO:  calendario LLAVEABRE  PARAMETROSCALENDARIO  LLAVECIERRA
+              {
+                std::cout << "Calendario"<<std::endl;
+              }
  PARAMETROSN:	nombre DOSPUNTOS STRING PUNTOCOMA
 	             descripcion DOSPUNTOS STRING PUNTOCOMA
 	             inicio DOSPUNTOS COMILLAS TIEMPO COMILLAS PUNTOCOMA
 	             fin DOSPUNTOS COMILLAS TIEMPO COMILLAS PUNTOCOMA
-	             recordatorio DOSPUNTOS COMILLAS FLOAT COMILLAS PUNTOCOMA {}
- PARAMETROSO:  lugar DOSPUNTOS STRING PUNTOCOMA  PARAMETROSO {}
-                |archivo DOSPUNTOS STRING PUNTOCOMA  PARAMETROSO {}
-                |invitados DOSPUNTOS REGLAMAIL PUNTOCOMA  PARAMETROSO {}
-                |zona DOSPUNTOS COMILLAS ZONA COMILLAS PUNTOCOMA  PARAMETROSO {}
-                | {}
- PARAMETROSCALENDARIO:  nombre DOSPUNTOS STRING PUNTOCOMA descripcion DOSPUNTOS STRING PUNTOCOMA {}
-                        |nombre DOSPUNTOS STRING PUNTOCOMA {}
- CONSULTAR:  consultar  EVENTOBUSQUEDA  {}
- MODIFICAR:  modificar  EVENTO {}
- ELIMINAR:  eliminar evento LLAVEABRE  CALENDARID   EVENTID  LLAVECIERRA {}
- CREAR: crear  EVENTO  {}
-        | crear  CALENDARIO {}
- FUNCIONES:   CREAR   FUNCIONES  {}
-              | CONSULTAR   FUNCIONES  {}
-              | MODIFICAR   FUNCIONES {}
-              | ELIMINAR   FUNCIONES {}
-              | {}
+	             recordatorio DOSPUNTOS COMILLAS FLOAT COMILLAS PUNTOCOMA
+              {
+                std::cout << "Parametros necesarios"<<std::endl;
+              }
+ PARAMETROSO:  lugar DOSPUNTOS STRING PUNTOCOMA  PARAMETROSO
+                {
+                  std::cout << "(Opcional) lugar"<<std::endl;
+                }
+                |archivo DOSPUNTOS STRING PUNTOCOMA  PARAMETROSO
+                {
+                  std::cout << "(Opcional) archivo"<<std::endl;
+                }
+                |invitados DOSPUNTOS REGLAMAIL PUNTOCOMA  PARAMETROSO
+                {
+                  std::cout << "(Opcional) invitados"<<std::endl;
+                }
+                |zona DOSPUNTOS COMILLAS ZONA COMILLAS PUNTOCOMA  PARAMETROSO
+                {
+                  std::cout << "(Opcional) zona"<<std::endl;
+                }
+                | 
+                {
+                  std::cout << "(Opcional) empty parms"<<std::endl;
+                }
+ PARAMETROSCALENDARIO:  nombre DOSPUNTOS STRING PUNTOCOMA descripcion DOSPUNTOS STRING PUNTOCOMA
+                        {
+                          std::cout << "Params calendario: Nombre y descripción"<<std::endl;
+                        }
+                        |nombre DOSPUNTOS STRING PUNTOCOMA
+                        {
+                          std::cout << "Params calendario: Nombre"<<std::endl;
+                        }
+ CONSULTAR:  consultar  EVENTOBUSQUEDA
+              {
+                std::cout << "Consultar evento"<<std::endl;
+              }
+ MODIFICAR:  modificar  EVENTO
+              {
+                std::cout << "Modificar evento"<<std::endl;
+              }
+ ELIMINAR:  eliminar evento LLAVEABRE  CALENDARID   EVENTID  LLAVECIERRA
+            {
+              std::cout << "Eliminar evento"<<std::endl;
+            }
+ CREAR: crear  EVENTO
+        {
+          std::cout << "Crear evento"<<std::endl;
+        }
+        | crear  CALENDARIO
+        {
+          std::cout << "Crear calendario"<<std::endl;
+        }
+ FUNCIONES:   CREAR   FUNCIONES
+              {
+                std::cout << "Crear funciones"<<std::endl;
+              }
+              | CONSULTAR   FUNCIONES 
+              {
+                std::cout << "Consultar funciones"<<std::endl;
+              }
+              | MODIFICAR   FUNCIONES
+              {
+                std::cout << "Modificar funciones"<<std::endl;
+              }
+              | ELIMINAR   FUNCIONES
+              {
+                std::cout << "Eliminar funciones"<<std::endl;
+              }
+              | 
+              {
+                std::cout << "Funciones empty"<<std::endl;
+              }
 %%
 //-- FUNCTION DEFINITIONS ---------------------------------
 int main( int argc, char **argv )
