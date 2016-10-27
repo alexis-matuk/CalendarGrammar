@@ -66,89 +66,91 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     Program = 258,
-     ID = 259,
-     identifier = 260,
-     calendar_id = 261,
-     api_key = 262,
-     event_id = 263,
-     declare = 264,
-     calendario = 265,
-     user_id = 266,
-     permission = 267,
-     crear = 268,
-     consultar = 269,
-     modificar = 270,
-     eliminar = 271,
-     evento = 272,
-     nombre = 273,
-     descripcion = 274,
-     inicio = 275,
-     fin = 276,
-     zona = 277,
-     recordatorio = 278,
-     fecha = 279,
-     invitados = 280,
-     lugar = 281,
-     archivo = 282,
-     READ = 283,
-     WRITE = 284,
-     STRING = 285,
-     ZONA = 286,
-     HORA = 287,
-     FECHA = 288,
-     FLOAT = 289,
-     MAIL = 290,
-     LLAVEABRE = 291,
-     LLAVECIERRA = 292,
-     IGUAL = 293,
-     COMILLAS = 294,
-     DOSPUNTOS = 295,
-     PUNTOCOMA = 296,
-     COMA = 297
+     program = 258,
+     identifier = 259,
+     calendar_id = 260,
+     api_key = 261,
+     event_id = 262,
+     declare = 263,
+     calendario = 264,
+     user_id = 265,
+     permissions = 266,
+     crear = 267,
+     consultar = 268,
+     modificar = 269,
+     eliminar = 270,
+     evento = 271,
+     nombre = 272,
+     descripcion = 273,
+     inicio = 274,
+     fin = 275,
+     zona = 276,
+     recordatorio = 277,
+     invitados = 278,
+     lugar = 279,
+     archivo = 280,
+     READ = 281,
+     WRITE = 282,
+     ZONA = 283,
+     HORA = 284,
+     FECHA = 285,
+     FLOAT = 286,
+     MAIL = 287,
+     LLAVEABRE = 288,
+     LLAVECIERRA = 289,
+     IGUAL = 290,
+     DOSPUNTOS = 291,
+     PUNTOCOMA = 292,
+     COMA = 293,
+     COMILLASIMPLE = 294,
+     ID = 295,
+     ALPHANUM = 296,
+     AND = 297,
+     URL = 298
    };
 #endif
 /* Tokens.  */
-#define Program 258
-#define ID 259
-#define identifier 260
-#define calendar_id 261
-#define api_key 262
-#define event_id 263
-#define declare 264
-#define calendario 265
-#define user_id 266
-#define permission 267
-#define crear 268
-#define consultar 269
-#define modificar 270
-#define eliminar 271
-#define evento 272
-#define nombre 273
-#define descripcion 274
-#define inicio 275
-#define fin 276
-#define zona 277
-#define recordatorio 278
-#define fecha 279
-#define invitados 280
-#define lugar 281
-#define archivo 282
-#define READ 283
-#define WRITE 284
-#define STRING 285
-#define ZONA 286
-#define HORA 287
-#define FECHA 288
-#define FLOAT 289
-#define MAIL 290
-#define LLAVEABRE 291
-#define LLAVECIERRA 292
-#define IGUAL 293
-#define COMILLAS 294
-#define DOSPUNTOS 295
-#define PUNTOCOMA 296
-#define COMA 297
+#define program 258
+#define identifier 259
+#define calendar_id 260
+#define api_key 261
+#define event_id 262
+#define declare 263
+#define calendario 264
+#define user_id 265
+#define permissions 266
+#define crear 267
+#define consultar 268
+#define modificar 269
+#define eliminar 270
+#define evento 271
+#define nombre 272
+#define descripcion 273
+#define inicio 274
+#define fin 275
+#define zona 276
+#define recordatorio 277
+#define invitados 278
+#define lugar 279
+#define archivo 280
+#define READ 281
+#define WRITE 282
+#define ZONA 283
+#define HORA 284
+#define FECHA 285
+#define FLOAT 286
+#define MAIL 287
+#define LLAVEABRE 288
+#define LLAVECIERRA 289
+#define IGUAL 290
+#define DOSPUNTOS 291
+#define PUNTOCOMA 292
+#define COMA 293
+#define COMILLASIMPLE 294
+#define ID 295
+#define ALPHANUM 296
+#define AND 297
+#define URL 298
 
 
 
@@ -164,7 +166,7 @@ using namespace std;
 
 extern FILE *yyin;
 int yylex(); 
-int yyerror(const char *p) { cerr << "Error!" << endl; return 0; }
+int yyerror(const char *p) { cerr << "Error with source!" << endl; return 0; }
 
 
 /* Enabling traces.  */
@@ -192,7 +194,7 @@ typedef union YYSTYPE
   int val;
 }
 /* Line 193 of yacc.c.  */
-#line 196 "calendar.tab.cpp"
+#line 198 "calendar.tab.cpp"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -205,7 +207,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 209 "calendar.tab.cpp"
+#line 211 "calendar.tab.cpp"
 
 #ifdef short
 # undef short
@@ -420,20 +422,20 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  4
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   131
+#define YYLAST   147
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  43
+#define YYNTOKENS  44
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  19
+#define YYNNTS  21
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  33
+#define YYNRULES  38
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  136
+#define YYNSTATES  158
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   297
+#define YYMAXUTOK   298
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -470,7 +472,7 @@ static const yytype_uint8 yytranslate[] =
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    40,    41,    42
+      35,    36,    37,    38,    39,    40,    41,    42,    43
 };
 
 #if YYDEBUG
@@ -479,41 +481,44 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyprhs[] =
 {
        0,     0,     3,    10,    12,    16,    34,    39,    40,    45,
-      47,    50,    56,    60,    67,    73,    78,   105,   111,   117,
-     123,   131,   132,   141,   146,   149,   152,   159,   162,   165,
-     168,   171,   174,   177
+      47,    50,    56,    60,    67,    73,    78,    91,    97,   103,
+     106,   107,   132,   138,   144,   150,   158,   159,   168,   173,
+     176,   179,   186,   189,   192,   195,   198,   201,   204
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      44,     0,    -1,     3,     4,    36,    46,    61,    37,    -1,
-      28,    -1,    28,    42,    29,    -1,     9,    11,    38,    30,
-      41,     9,     7,    38,    30,    41,     9,    12,    38,    39,
-      45,    39,    41,    -1,     5,    40,    30,    41,    -1,    -1,
-       5,    40,    30,    41,    -1,    33,    -1,    33,    32,    -1,
-      39,    35,    39,    42,    50,    -1,    39,    35,    39,    -1,
-      17,    36,    47,    54,    55,    37,    -1,    17,    36,    47,
-      54,    37,    -1,    10,    36,    56,    37,    -1,    18,    40,
-      30,    41,    19,    40,    30,    41,    20,    40,    39,    49,
-      39,    41,    21,    40,    39,    49,    39,    41,    23,    40,
-      39,    34,    39,    41,    -1,    26,    40,    30,    41,    55,
-      -1,    27,    40,    30,    41,    55,    -1,    25,    40,    50,
-      41,    55,    -1,    22,    40,    39,    31,    39,    41,    55,
-      -1,    -1,    18,    40,    30,    41,    19,    40,    30,    41,
-      -1,    18,    40,    30,    41,    -1,    14,    52,    -1,    15,
-      51,    -1,    16,    17,    36,    47,    48,    37,    -1,    13,
-      51,    -1,    13,    53,    -1,    60,    61,    -1,    57,    61,
-      -1,    58,    61,    -1,    59,    61,    -1,    -1
+      45,     0,    -1,     3,    41,    33,    47,    64,    34,    -1,
+      26,    -1,    26,    42,    27,    -1,     8,    10,    35,    41,
+      37,     8,     6,    35,    41,    37,     8,    11,    35,    39,
+      46,    39,    37,    -1,     4,    36,    41,    37,    -1,    -1,
+       4,    36,    41,    37,    -1,    30,    -1,    30,    29,    -1,
+      39,    32,    39,    38,    51,    -1,    39,    32,    39,    -1,
+      16,    33,    48,    57,    58,    34,    -1,    16,    33,    48,
+      56,    34,    -1,     9,    33,    59,    34,    -1,    19,    36,
+      39,    50,    39,    37,    20,    36,    39,    50,    39,    37,
+      -1,    17,    36,    41,    37,    56,    -1,    18,    36,    41,
+      37,    56,    -1,    55,    56,    -1,    -1,    17,    36,    41,
+      37,    18,    36,    41,    37,    19,    36,    39,    50,    39,
+      37,    20,    36,    39,    50,    39,    37,    22,    36,    31,
+      37,    -1,    24,    36,    41,    37,    58,    -1,    25,    36,
+      43,    37,    58,    -1,    23,    36,    51,    37,    58,    -1,
+      21,    36,    39,    28,    39,    37,    58,    -1,    -1,    17,
+      36,    41,    37,    18,    36,    41,    37,    -1,    17,    36,
+      41,    37,    -1,    13,    53,    -1,    14,    52,    -1,    15,
+      16,    33,    48,    49,    34,    -1,    12,    52,    -1,    12,
+      54,    -1,    63,    64,    -1,    60,    64,    -1,    61,    64,
+      -1,    62,    64,    -1,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    21,    21,    22,    23,    24,    27,    28,    29,    30,
-      30,    31,    32,    33,    34,    35,    36,    41,    42,    43,
-      44,    45,    46,    47,    48,    49,    50,    51,    52,    53,
-      54,    55,    56,    57
+       0,    21,    21,    25,    29,    33,    39,    43,    46,    50,
+      54,    58,    62,    66,    70,    74,    78,    83,    87,    91,
+      96,    99,   107,   111,   115,   119,   124,   127,   131,   135,
+     139,   143,   147,   151,   155,   159,   163,   167,   172
 };
 #endif
 
@@ -522,17 +527,17 @@ static const yytype_uint8 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "Program", "ID", "identifier",
-  "calendar_id", "api_key", "event_id", "declare", "calendario", "user_id",
-  "permission", "crear", "consultar", "modificar", "eliminar", "evento",
-  "nombre", "descripcion", "inicio", "fin", "zona", "recordatorio",
-  "fecha", "invitados", "lugar", "archivo", "READ", "WRITE", "STRING",
-  "ZONA", "HORA", "FECHA", "FLOAT", "MAIL", "LLAVEABRE", "LLAVECIERRA",
-  "IGUAL", "COMILLAS", "DOSPUNTOS", "PUNTOCOMA", "COMA", "$accept",
+  "$end", "error", "$undefined", "program", "identifier", "calendar_id",
+  "api_key", "event_id", "declare", "calendario", "user_id", "permissions",
+  "crear", "consultar", "modificar", "eliminar", "evento", "nombre",
+  "descripcion", "inicio", "fin", "zona", "recordatorio", "invitados",
+  "lugar", "archivo", "READ", "WRITE", "ZONA", "HORA", "FECHA", "FLOAT",
+  "MAIL", "LLAVEABRE", "LLAVECIERRA", "IGUAL", "DOSPUNTOS", "PUNTOCOMA",
+  "COMA", "COMILLASIMPLE", "ID", "ALPHANUM", "AND", "URL", "$accept",
   "PROGRAM", "PERMISSION", "SETUP", "CALENDARID", "EVENTID", "TIEMPO",
-  "REGLAMAIL", "EVENTO", "EVENTOBUSQUEDA", "CALENDARIO", "PARAMETROSN",
-  "PARAMETROSO", "PARAMETROSCALENDARIO", "CONSULTAR", "MODIFICAR",
-  "ELIMINAR", "CREAR", "FUNCIONES", 0
+  "REGLAMAIL", "EVENTO", "EVENTOBUSQUEDA", "CALENDARIO", "INICIOFIN",
+  "PARAMETROSB", "PARAMETROSN", "PARAMETROSO", "PARAMETROSCALENDARIO",
+  "CONSULTAR", "MODIFICAR", "ELIMINAR", "CREAR", "FUNCIONES", 0
 };
 #endif
 
@@ -545,26 +550,26 @@ static const yytype_uint16 yytoknum[] =
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
      285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
-     295,   296,   297
+     295,   296,   297,   298
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    43,    44,    45,    45,    46,    47,    47,    48,    49,
-      49,    50,    50,    51,    52,    53,    54,    55,    55,    55,
-      55,    55,    56,    56,    57,    58,    59,    60,    60,    61,
-      61,    61,    61,    61
+       0,    44,    45,    46,    46,    47,    48,    48,    49,    50,
+      50,    51,    51,    52,    53,    54,    55,    56,    56,    56,
+      56,    57,    58,    58,    58,    58,    58,    59,    59,    60,
+      61,    62,    63,    63,    64,    64,    64,    64,    64
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     6,     1,     3,    17,     4,     0,     4,     1,
-       2,     5,     3,     6,     5,     4,    26,     5,     5,     5,
-       7,     0,     8,     4,     2,     2,     6,     2,     2,     2,
-       2,     2,     2,     0
+       2,     5,     3,     6,     5,     4,    12,     5,     5,     2,
+       0,    24,     5,     5,     5,     7,     0,     8,     4,     2,
+       2,     6,     2,     2,     2,     2,     2,     2,     0
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -572,55 +577,61 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     0,     0,     0,     1,     0,     0,    33,     0,     0,
-       0,     0,     0,    33,    33,    33,    33,     0,     0,     0,
-       0,    27,    28,     0,    24,    25,     0,    30,    31,    32,
-      29,     2,     0,     0,     7,     7,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,    15,     0,     0,    21,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,    14,     0,    26,     0,    23,     6,     0,     0,
-       0,     0,     0,    13,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     8,     0,     0,     0,     0,     0,    21,
-      21,    21,     0,     0,     0,     0,    12,    19,    17,    18,
-       0,    22,     0,    21,     0,     0,     0,    20,    11,     0,
-       0,     3,     0,     0,     0,     0,     0,     4,     5,     9,
-       0,    10,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,    16
+       0,     0,     0,     0,     1,     0,     0,    38,     0,     0,
+       0,     0,     0,    38,    38,    38,    38,     0,     0,     0,
+       0,    32,    33,     0,    29,    30,     0,    35,    36,    37,
+      34,     2,     0,     0,     7,     7,     0,     0,     0,     0,
+       0,     0,    20,     0,     0,     0,    15,     0,     0,    26,
+       0,     0,     0,    20,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,    19,
+      14,     0,    31,     0,    28,     6,     0,     0,     0,     0,
+       0,    13,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,    20,    20,     9,     0,     8,     0,
+       0,     0,     0,     0,    26,    26,    26,    17,    18,    10,
+       0,     0,     0,     0,     0,    12,    24,    22,    23,     0,
+       0,    27,     0,    26,     0,     0,     0,     0,    25,    11,
+       0,     0,     0,     0,     3,     0,     0,     0,     0,     0,
+       0,     0,     4,     5,     0,    16,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,    21
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
-static const yytype_int8 yydefgoto[] =
+static const yytype_int16 yydefgoto[] =
 {
-      -1,     2,   112,     7,    41,    52,   120,    80,    21,    24,
-      22,    49,    61,    39,    13,    14,    15,    16,    17
+      -1,     2,   135,     7,    41,    56,    97,    91,    21,    24,
+      22,    53,    54,    49,    65,    39,    13,    14,    15,    16,
+      17
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -90
-static const yytype_int8 yypact[] =
+#define YYPACT_NINF -130
+static const yytype_int16 yypact[] =
 {
-       8,     9,    12,   -13,   -90,    15,    14,     2,   -12,    -7,
-      10,    11,    13,     2,     2,     2,     2,    -8,     1,    -4,
-      -3,   -90,   -90,    -2,   -90,   -90,    -1,   -90,   -90,   -90,
-     -90,   -90,    -5,    19,    33,    33,    33,    30,     0,     4,
-       3,    24,    24,    39,    38,    16,   -90,    17,    18,   -18,
-      20,    21,    22,    25,     7,    23,    26,    27,    28,    29,
-      31,    35,   -90,    32,   -90,    36,    34,   -90,    37,    40,
-      41,    43,    44,   -90,    42,    45,    47,    46,    50,    49,
-      48,    51,    52,   -90,    61,    55,    54,    56,    57,   -18,
-     -18,   -18,    63,    58,    60,    59,    62,   -90,   -90,   -90,
-      53,   -90,    64,   -18,    41,    67,    68,   -90,   -90,    69,
-      70,    65,    72,    73,    74,    75,    76,   -90,   -90,    66,
-      78,   -90,    77,    80,    79,    81,    76,    82,    83,    85,
-      86,    84,    88,    89,    90,   -90
+       4,   -13,    29,    -3,  -130,    23,    22,     1,    -2,    -4,
+      18,    19,    20,     1,     1,     1,     1,     3,    -1,     5,
+       6,  -130,  -130,    10,  -130,  -130,    11,  -130,  -130,  -130,
+    -130,  -130,     8,    30,    42,    42,    42,    40,    13,    16,
+      15,    35,     0,    49,    48,    14,  -130,    17,    21,   -15,
+      24,    25,    26,     0,    31,    27,    32,    33,    34,    36,
+      28,    38,    39,    41,    43,    44,    45,    46,    37,  -130,
+    -130,    47,  -130,    50,    52,  -130,    53,    54,    55,    51,
+      56,  -130,    58,    59,    67,    61,    63,    65,    62,    57,
+      70,    66,    68,    69,     0,     0,    60,    71,  -130,    64,
+      72,    73,    75,    76,   -15,   -15,   -15,  -130,  -130,  -130,
+      74,    93,    79,    77,    80,    81,  -130,  -130,  -130,    87,
+      85,  -130,    84,   -15,    55,    86,    88,    89,  -130,  -130,
+      90,    97,    92,    67,    82,    91,    94,    95,    98,    99,
+      67,   100,  -130,  -130,    96,  -130,   101,   106,   103,   102,
+      67,   104,   105,   109,   108,   114,   110,  -130
 };
 
 /* YYPGOTO[NTERM-NUM].  */
-static const yytype_int8 yypgoto[] =
+static const yytype_int16 yypgoto[] =
 {
-     -90,   -90,   -90,   -90,   -30,   -90,   -77,   -54,    71,   -90,
-     -90,    87,   -89,   -90,   -90,   -90,   -90,   -90,     6
+    -130,  -130,  -130,  -130,    -9,  -130,  -129,   -68,   121,  -130,
+    -130,  -130,   -53,  -130,  -103,  -130,  -130,  -130,  -130,  -130,
+       9
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -630,58 +641,62 @@ static const yytype_int8 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-      97,    98,    99,    19,    57,    42,    43,    58,    59,    60,
-      20,     1,     4,     3,   107,     9,    10,    11,    12,    27,
-      28,    29,    30,     5,     6,     8,    18,    23,    20,    31,
-      26,    32,    33,    34,    35,    36,    37,    38,    40,    44,
-      45,    46,    48,    47,    51,    53,    54,    55,    66,   127,
-     108,     0,     0,    76,     0,     0,    68,    62,    56,    64,
-       0,    63,    74,    65,    67,    86,    75,    69,    70,    71,
-      92,    72,    73,    81,    82,   100,     0,     0,    77,    78,
-      79,    87,    25,    83,    88,    93,    84,    85,   110,    89,
-     102,   105,    90,    91,    94,    95,    96,   111,   121,   101,
-     103,   124,     0,   117,   104,   106,   109,   114,   130,   119,
-     113,   115,   116,     0,     0,     0,   118,   122,   123,   125,
-     126,   128,   133,   132,   129,     0,   131,     0,   134,    50,
-       0,   135
+      69,   116,   117,   118,   137,    19,    61,     1,    62,    63,
+      64,   144,    20,     9,    10,    11,    12,    50,    51,    52,
+     128,   151,    27,    28,    29,    30,    42,    43,     3,     4,
+       5,     6,     8,    18,    23,    20,    26,    31,    33,    34,
+      32,   107,   108,    35,    36,    37,    40,    38,    44,    45,
+      46,    47,    48,    55,    57,    58,   129,    60,    59,     0,
+      66,    67,    68,    71,     0,    70,    72,     0,    73,    76,
+      87,    74,   111,    75,    77,    78,    84,    79,    81,    80,
+     101,     0,     0,     0,     0,   102,    82,    83,    85,   109,
+      88,    86,    92,    89,    90,    94,    95,    96,    98,    93,
+      99,   100,   103,   104,   120,   105,   106,   125,   132,   113,
+     110,   119,     0,   112,   114,   115,   121,   123,   122,   124,
+     126,   127,   130,   134,   138,   142,   148,   131,   136,   133,
+     139,   154,    25,   140,   141,   146,   143,   145,   147,   149,
+       0,   150,   153,   152,   155,   156,     0,   157
 };
 
-static const yytype_int8 yycheck[] =
+static const yytype_int16 yycheck[] =
 {
-      89,    90,    91,    10,    22,    35,    36,    25,    26,    27,
-      17,     3,     0,     4,   103,    13,    14,    15,    16,    13,
-      14,    15,    16,    36,     9,    11,    38,    17,    17,    37,
-      17,    30,    36,    36,    36,    36,    41,    18,     5,     9,
-      40,    37,    18,    40,     5,     7,    30,    30,    41,   126,
-     104,    -1,    -1,    19,    -1,    -1,    30,    37,    40,    37,
-      -1,    40,    30,    38,    41,    19,    30,    40,    40,    40,
-       9,    40,    37,    30,    30,    12,    -1,    -1,    41,    39,
-      39,    31,    11,    41,    35,    30,    41,    40,    20,    41,
-      30,    38,    41,    41,    40,    39,    39,    28,    32,    41,
-      41,    21,    -1,    29,    42,    41,    39,    42,    23,    33,
-      40,    39,    39,    -1,    -1,    -1,    41,    39,    41,    40,
-      39,    39,    34,    39,    41,    -1,    40,    -1,    39,    42,
-      -1,    41
+      53,   104,   105,   106,   133,     9,    21,     3,    23,    24,
+      25,   140,    16,    12,    13,    14,    15,    17,    18,    19,
+     123,   150,    13,    14,    15,    16,    35,    36,    41,     0,
+      33,     8,    10,    35,    16,    16,    16,    34,    33,    33,
+      41,    94,    95,    33,    33,    37,     4,    17,     8,    36,
+      34,    36,    17,     4,     6,    41,   124,    36,    41,    -1,
+      36,    36,    36,    36,    -1,    34,    34,    -1,    35,    41,
+      18,    37,     8,    37,    36,    36,    39,    36,    34,    36,
+      18,    -1,    -1,    -1,    -1,    28,    41,    41,    41,    29,
+      37,    41,    41,    39,    39,    37,    37,    30,    37,    43,
+      37,    36,    32,    37,    11,    37,    37,    20,    19,    36,
+      39,    37,    -1,    41,    39,    39,    37,    37,    41,    38,
+      35,    37,    36,    26,    42,    27,    20,    39,    36,    39,
+      39,    22,    11,    39,    39,    39,    37,    37,    37,    36,
+      -1,    39,    37,    39,    36,    31,    -1,    37
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,    44,     4,     0,    36,     9,    46,    11,    13,
-      14,    15,    16,    57,    58,    59,    60,    61,    38,    10,
-      17,    51,    53,    17,    52,    51,    17,    61,    61,    61,
-      61,    37,    30,    36,    36,    36,    36,    41,    18,    56,
-       5,    47,    47,    47,     9,    40,    37,    40,    18,    54,
-      54,     5,    48,     7,    30,    30,    40,    22,    25,    26,
-      27,    55,    37,    40,    37,    38,    41,    41,    30,    40,
-      40,    40,    40,    37,    30,    30,    19,    41,    39,    39,
-      50,    30,    30,    41,    41,    40,    19,    31,    35,    41,
-      41,    41,     9,    30,    40,    39,    39,    55,    55,    55,
-      12,    41,    30,    41,    42,    38,    41,    55,    50,    39,
-      20,    28,    45,    40,    42,    39,    39,    29,    41,    33,
-      49,    32,    39,    41,    21,    40,    39,    49,    39,    41,
-      23,    40,    39,    34,    39,    41
+       0,     3,    45,    41,     0,    33,     8,    47,    10,    12,
+      13,    14,    15,    60,    61,    62,    63,    64,    35,     9,
+      16,    52,    54,    16,    53,    52,    16,    64,    64,    64,
+      64,    34,    41,    33,    33,    33,    33,    37,    17,    59,
+       4,    48,    48,    48,     8,    36,    34,    36,    17,    57,
+      17,    18,    19,    55,    56,     4,    49,     6,    41,    41,
+      36,    21,    23,    24,    25,    58,    36,    36,    36,    56,
+      34,    36,    34,    35,    37,    37,    41,    36,    36,    36,
+      36,    34,    41,    41,    39,    41,    41,    18,    37,    39,
+      39,    51,    41,    43,    37,    37,    30,    50,    37,    37,
+      36,    18,    28,    32,    37,    37,    37,    56,    56,    29,
+      39,     8,    41,    36,    39,    39,    58,    58,    58,    37,
+      11,    37,    41,    37,    38,    20,    35,    37,    58,    51,
+      36,    39,    19,    39,    26,    46,    36,    50,    42,    39,
+      39,    39,    27,    37,    50,    37,    39,    37,    20,    36,
+      39,    50,    39,    37,    22,    36,    31,    37
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1496,163 +1511,267 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 21 "calendar.ypp"
-    {;}
+#line 22 "calendar.ypp"
+    {
+    std::cout << "--program->program ALPHANUM {setup funciones}"<<std::endl;
+  ;}
     break;
 
   case 3:
-#line 22 "calendar.ypp"
-    {;}
+#line 26 "calendar.ypp"
+    {
+                std::cout << "--Read permissions"<<std::endl;
+              ;}
     break;
 
   case 4:
-#line 23 "calendar.ypp"
-    {;}
+#line 30 "calendar.ypp"
+    {
+                std::cout << "--Read, write permissions"<<std::endl;
+              ;}
     break;
 
   case 5:
-#line 26 "calendar.ypp"
-    {;}
+#line 36 "calendar.ypp"
+    {
+              std::cout << "--Declare Setup"<<std::endl;
+            ;}
     break;
 
   case 6:
-#line 27 "calendar.ypp"
-    {;}
+#line 40 "calendar.ypp"
+    {
+                std::cout << "--CalendarId"<<std::endl;
+              ;}
     break;
 
   case 7:
-#line 28 "calendar.ypp"
-    {;}
+#line 43 "calendar.ypp"
+    {
+                  std::cout << "--Empty CalendarId"<<std::endl;
+                ;}
     break;
 
   case 8:
-#line 29 "calendar.ypp"
-    {;}
+#line 47 "calendar.ypp"
+    {
+              std::cout << "--EventId"<<std::endl;
+            ;}
+    break;
+
+  case 9:
+#line 51 "calendar.ypp"
+    {
+            std::cout << "--Fecha"<<std::endl;
+          ;}
     break;
 
   case 10:
-#line 30 "calendar.ypp"
-    {;}
+#line 55 "calendar.ypp"
+    {
+              std::cout << "--Fecha Hora"<<std::endl;
+          ;}
     break;
 
   case 11:
-#line 31 "calendar.ypp"
-    {;}
+#line 59 "calendar.ypp"
+    {
+              std::cout << "--Mail repetido"<<std::endl;
+            ;}
     break;
 
   case 12:
-#line 32 "calendar.ypp"
-    {;}
+#line 63 "calendar.ypp"
+    {
+              std::cout << "--Mail"<<std::endl;
+            ;}
     break;
 
   case 13:
-#line 33 "calendar.ypp"
-    {;}
+#line 67 "calendar.ypp"
+    {
+              std::cout << "--Evento"<<std::endl;
+          ;}
     break;
 
   case 14:
-#line 34 "calendar.ypp"
-    {;}
+#line 71 "calendar.ypp"
+    {
+                    std::cout << "--Evento Búsqueda"<<std::endl;
+                  ;}
     break;
 
   case 15:
-#line 35 "calendar.ypp"
-    {;}
+#line 75 "calendar.ypp"
+    {
+                std::cout << "--Calendario"<<std::endl;
+              ;}
     break;
 
   case 16:
-#line 40 "calendar.ypp"
-    {;}
+#line 80 "calendar.ypp"
+    {
+              std::cout << "--InicioFin" << std::endl;
+            ;}
     break;
 
   case 17:
-#line 41 "calendar.ypp"
-    {;}
+#line 84 "calendar.ypp"
+    {
+                std::cout << "--(Optional search) nombre"<<std::endl;
+              ;}
     break;
 
   case 18:
-#line 42 "calendar.ypp"
-    {;}
+#line 88 "calendar.ypp"
+    {
+                std::cout << "--(Optional search) descripcion"<<std::endl;
+              ;}
     break;
 
   case 19:
-#line 43 "calendar.ypp"
-    {;}
+#line 92 "calendar.ypp"
+    {
+                std::cout << "--(Optional search) Inicio y Fin"<<std::endl;
+              ;}
     break;
 
   case 20:
-#line 44 "calendar.ypp"
-    {;}
+#line 96 "calendar.ypp"
+    {
+                std::cout << "--Parametros search empty"<<std::endl;
+              ;}
     break;
 
   case 21:
-#line 45 "calendar.ypp"
-    {;}
+#line 104 "calendar.ypp"
+    {
+                std::cout << "--Parametros necesarios"<<std::endl;
+              ;}
     break;
 
   case 22:
-#line 46 "calendar.ypp"
-    {;}
+#line 108 "calendar.ypp"
+    {
+                  std::cout << "--(Opcional) lugar"<<std::endl;
+                ;}
     break;
 
   case 23:
-#line 47 "calendar.ypp"
-    {;}
+#line 112 "calendar.ypp"
+    {
+                  std::cout << "--(Opcional) archivo"<<std::endl;
+                ;}
     break;
 
   case 24:
-#line 48 "calendar.ypp"
-    {;}
+#line 116 "calendar.ypp"
+    {
+                  std::cout << "--(Opcional) invitados"<<std::endl;
+                ;}
     break;
 
   case 25:
-#line 49 "calendar.ypp"
-    {;}
+#line 120 "calendar.ypp"
+    {
+                  std::cout << "--(Opcional) zona"<<std::endl;
+                ;}
     break;
 
   case 26:
-#line 50 "calendar.ypp"
-    {;}
+#line 124 "calendar.ypp"
+    {
+                  std::cout << "--(Opcional) empty parms"<<std::endl;
+                ;}
     break;
 
   case 27:
-#line 51 "calendar.ypp"
-    {;}
+#line 128 "calendar.ypp"
+    {
+                          std::cout << "--Params calendario: Nombre y descripción"<<std::endl;
+                        ;}
     break;
 
   case 28:
-#line 52 "calendar.ypp"
-    {;}
+#line 132 "calendar.ypp"
+    {
+                          std::cout << "--Params calendario: Nombre"<<std::endl;
+                        ;}
     break;
 
   case 29:
-#line 53 "calendar.ypp"
-    {;}
+#line 136 "calendar.ypp"
+    {
+                std::cout << "--Consultar evento"<<std::endl;
+              ;}
     break;
 
   case 30:
-#line 54 "calendar.ypp"
-    {;}
+#line 140 "calendar.ypp"
+    {
+                std::cout << "--Modificar evento"<<std::endl;
+              ;}
     break;
 
   case 31:
-#line 55 "calendar.ypp"
-    {;}
+#line 144 "calendar.ypp"
+    {
+              std::cout << "--Eliminar evento"<<std::endl;
+            ;}
     break;
 
   case 32:
-#line 56 "calendar.ypp"
-    {;}
+#line 148 "calendar.ypp"
+    {
+          std::cout << "--Crear evento"<<std::endl;
+        ;}
     break;
 
   case 33:
-#line 57 "calendar.ypp"
-    {;}
+#line 152 "calendar.ypp"
+    {
+          std::cout << "--Crear calendario"<<std::endl;
+        ;}
+    break;
+
+  case 34:
+#line 156 "calendar.ypp"
+    {
+                std::cout << "--Crear funciones"<<std::endl;
+              ;}
+    break;
+
+  case 35:
+#line 160 "calendar.ypp"
+    {
+                std::cout << "--Consultar funciones"<<std::endl;
+              ;}
+    break;
+
+  case 36:
+#line 164 "calendar.ypp"
+    {
+                std::cout << "--Modificar funciones"<<std::endl;
+              ;}
+    break;
+
+  case 37:
+#line 168 "calendar.ypp"
+    {
+                std::cout << "--Eliminar funciones"<<std::endl;
+              ;}
+    break;
+
+  case 38:
+#line 172 "calendar.ypp"
+    {
+                std::cout << "--Funciones empty"<<std::endl;
+              ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1656 "calendar.tab.cpp"
+#line 1775 "calendar.tab.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1866,7 +1985,7 @@ yyreturn:
 }
 
 
-#line 58 "calendar.ypp"
+#line 175 "calendar.ypp"
 
 //-- FUNCTION DEFINITIONS ---------------------------------
 int main( int argc, char **argv )

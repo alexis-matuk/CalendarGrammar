@@ -1,0 +1,5 @@
+program 'nombre'{
+	declare user_id = 'qwertyuiop';
+	declare api_key = 'qwertyuiop';
+	declare permissions = 'R & W';
+}

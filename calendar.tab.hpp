@@ -39,89 +39,91 @@
    /* Put the tokens into the symbol table, so that GDB and other debuggers
       know about them.  */
    enum yytokentype {
-     Program = 258,
-     ID = 259,
-     identifier = 260,
-     calendar_id = 261,
-     api_key = 262,
-     event_id = 263,
-     declare = 264,
-     calendario = 265,
-     user_id = 266,
-     permission = 267,
-     crear = 268,
-     consultar = 269,
-     modificar = 270,
-     eliminar = 271,
-     evento = 272,
-     nombre = 273,
-     descripcion = 274,
-     inicio = 275,
-     fin = 276,
-     zona = 277,
-     recordatorio = 278,
-     fecha = 279,
-     invitados = 280,
-     lugar = 281,
-     archivo = 282,
-     READ = 283,
-     WRITE = 284,
-     STRING = 285,
-     ZONA = 286,
-     HORA = 287,
-     FECHA = 288,
-     FLOAT = 289,
-     MAIL = 290,
-     LLAVEABRE = 291,
-     LLAVECIERRA = 292,
-     IGUAL = 293,
-     COMILLAS = 294,
-     DOSPUNTOS = 295,
-     PUNTOCOMA = 296,
-     COMA = 297
+     program = 258,
+     identifier = 259,
+     calendar_id = 260,
+     api_key = 261,
+     event_id = 262,
+     declare = 263,
+     calendario = 264,
+     user_id = 265,
+     permissions = 266,
+     crear = 267,
+     consultar = 268,
+     modificar = 269,
+     eliminar = 270,
+     evento = 271,
+     nombre = 272,
+     descripcion = 273,
+     inicio = 274,
+     fin = 275,
+     zona = 276,
+     recordatorio = 277,
+     invitados = 278,
+     lugar = 279,
+     archivo = 280,
+     READ = 281,
+     WRITE = 282,
+     ZONA = 283,
+     HORA = 284,
+     FECHA = 285,
+     FLOAT = 286,
+     MAIL = 287,
+     LLAVEABRE = 288,
+     LLAVECIERRA = 289,
+     IGUAL = 290,
+     DOSPUNTOS = 291,
+     PUNTOCOMA = 292,
+     COMA = 293,
+     COMILLASIMPLE = 294,
+     ID = 295,
+     ALPHANUM = 296,
+     AND = 297,
+     URL = 298
    };
 #endif
 /* Tokens.  */
-#define Program 258
-#define ID 259
-#define identifier 260
-#define calendar_id 261
-#define api_key 262
-#define event_id 263
-#define declare 264
-#define calendario 265
-#define user_id 266
-#define permission 267
-#define crear 268
-#define consultar 269
-#define modificar 270
-#define eliminar 271
-#define evento 272
-#define nombre 273
-#define descripcion 274
-#define inicio 275
-#define fin 276
-#define zona 277
-#define recordatorio 278
-#define fecha 279
-#define invitados 280
-#define lugar 281
-#define archivo 282
-#define READ 283
-#define WRITE 284
-#define STRING 285
-#define ZONA 286
-#define HORA 287
-#define FECHA 288
-#define FLOAT 289
-#define MAIL 290
-#define LLAVEABRE 291
-#define LLAVECIERRA 292
-#define IGUAL 293
-#define COMILLAS 294
-#define DOSPUNTOS 295
-#define PUNTOCOMA 296
-#define COMA 297
+#define program 258
+#define identifier 259
+#define calendar_id 260
+#define api_key 261
+#define event_id 262
+#define declare 263
+#define calendario 264
+#define user_id 265
+#define permissions 266
+#define crear 267
+#define consultar 268
+#define modificar 269
+#define eliminar 270
+#define evento 271
+#define nombre 272
+#define descripcion 273
+#define inicio 274
+#define fin 275
+#define zona 276
+#define recordatorio 277
+#define invitados 278
+#define lugar 279
+#define archivo 280
+#define READ 281
+#define WRITE 282
+#define ZONA 283
+#define HORA 284
+#define FECHA 285
+#define FLOAT 286
+#define MAIL 287
+#define LLAVEABRE 288
+#define LLAVECIERRA 289
+#define IGUAL 290
+#define DOSPUNTOS 291
+#define PUNTOCOMA 292
+#define COMA 293
+#define COMILLASIMPLE 294
+#define ID 295
+#define ALPHANUM 296
+#define AND 297
+#define URL 298
 
 
 
@@ -133,7 +135,7 @@ typedef union YYSTYPE
   int val;
 }
 /* Line 1529 of yacc.c.  */
-#line 137 "calendar.tab.hpp"
+#line 139 "calendar.tab.hpp"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1

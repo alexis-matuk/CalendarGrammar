@@ -1,0 +1,23 @@
+program 'nombre'{
+	declare user_id = 'qwertyuiop';
+	declare api_key = 'qwertyuiop';
+	declare permissions = 'R & W';
+
+	crear evento{
+		identifier: 'hola';
+		nombre: 'Dentista';
+		descripcion: 'Visita al dentista';
+		inicio: '19 Septiembre 2016 16:00:00';
+		fin: '19 Septiembre 2016 16:30:00';
+		recordatorio: 24;	
+		zona: 'America/Mexico_City';				
+	}
+	 
+	consultar evento{
+		identifier: 'hola';
+		inicio: '12/09/2016';
+		fin: '12/09/2016';
+		nombre: 'hola';		
+		nombre: 'hola';		
+	}
+}

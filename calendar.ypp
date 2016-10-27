@@ -7,149 +7,170 @@ using namespace std;
 
 extern FILE *yyin;
 int yylex(); 
-int yyerror(const char *p) { cerr << "Error!" << endl; return 0; }
+int yyerror(const char *p) { cerr << "Error with source!" << endl; return 0; }
 %}
 
 //-- SYMBOL SEMANTIC VALUES -----------------------------
 %union {
   int val;
 };
-%token <val> Program ID identifier calendar_id api_key event_id declare calendario user_id permission crear consultar modificar eliminar evento nombre descripcion inicio fin zona recordatorio fecha invitados lugar archivo READ WRITE STRING ZONA HORA FECHA FLOAT MAIL LLAVEABRE LLAVECIERRA IGUAL COMILLAS DOSPUNTOS PUNTOCOMA COMA 
+%token <val> program identifier calendar_id api_key event_id declare calendario user_id permissions crear consultar modificar eliminar evento nombre descripcion inicio fin zona recordatorio invitados lugar archivo READ WRITE ZONA HORA FECHA FLOAT MAIL LLAVEABRE LLAVECIERRA IGUAL DOSPUNTOS PUNTOCOMA COMA COMILLASIMPLE ID ALPHANUM AND URL
 %type  <val> PROGRAM PERMISSION SETUP CALENDARID EVENTID TIEMPO EVENTO EVENTOBUSQUEDA CALENDARIO PARAMETROSN PARAMETROSO PARAMETROSCALENDARIO CONSULTAR MODIFICAR ELIMINAR CREAR FUNCIONES
 //-- GRAMMAR RULES ---------------------------------------
 %%
- PROGRAM: Program ID LLAVEABRE SETUP FUNCIONES LLAVECIERRA 
+ PROGRAM: program ALPHANUM LLAVEABRE SETUP FUNCIONES LLAVECIERRA 
   {
-    std::cout << "Program->Program ID {setup funciones}"<<std::endl;
+    std::cout << "--program->program ALPHANUM {setup funciones}"<<std::endl;
   }
  PERMISSION: READ 
               {
-                std::cout << "Read permission"<<std::endl;
+                std::cout << "--Read permissions"<<std::endl;
               }
-              | READ COMA WRITE 
+              | READ AND WRITE 
               {
-                std::cout << "Read, write permission"<<std::endl;
+                std::cout << "--Read, write permissions"<<std::endl;
               }
- SETUP:  declare user_id IGUAL STRING PUNTOCOMA
-          declare api_key IGUAL STRING PUNTOCOMA
-           declare permission IGUAL COMILLAS  PERMISSION  COMILLAS PUNTOCOMA
+ SETUP:  declare user_id IGUAL ALPHANUM PUNTOCOMA
+          declare api_key IGUAL ALPHANUM PUNTOCOMA
+           declare permissions IGUAL COMILLASIMPLE PERMISSION COMILLASIMPLE PUNTOCOMA
             {
-              std::cout << "Declare Setup"<<std::endl;
+              std::cout << "--Declare Setup"<<std::endl;
             }
- CALENDARID:  identifier DOSPUNTOS STRING PUNTOCOMA
+ CALENDARID:  identifier DOSPUNTOS ALPHANUM PUNTOCOMA
               {
-                std::cout << "CalendarId"<<std::endl;
+                std::cout << "--CalendarId"<<std::endl;
               }
               | {
-                  std::cout << "Empty CalendarId"<<std::endl;
+                  std::cout << "--Empty CalendarId"<<std::endl;
                 }
- EVENTID:  identifier DOSPUNTOS STRING PUNTOCOMA
+ EVENTID:  identifier DOSPUNTOS ALPHANUM PUNTOCOMA
             {
-              std::cout << "EventId"<<std::endl;
+              std::cout << "--EventId"<<std::endl;
             }
  TIEMPO:  FECHA
           {
-            std::cout << "Fecha"<<std::endl;
+            std::cout << "--Fecha"<<std::endl;
           }
           |FECHA HORA
           {
-              std::cout << "Fecha Hora"<<std::endl;
+              std::cout << "--Fecha Hora"<<std::endl;
           }
- REGLAMAIL:  COMILLAS MAIL COMILLAS COMA  REGLAMAIL
+ REGLAMAIL:  COMILLASIMPLE MAIL COMILLASIMPLE COMA  REGLAMAIL
             {
-              std::cout << "Mail repetido"<<std::endl;
+              std::cout << "--Mail repetido"<<std::endl;
             }
-            | COMILLAS MAIL COMILLAS
+            | COMILLASIMPLE MAIL COMILLASIMPLE
             {
-              std::cout << "Mail"<<std::endl;
+              std::cout << "--Mail"<<std::endl;
             }
  EVENTO:  evento LLAVEABRE  CALENDARID   PARAMETROSN   PARAMETROSO  LLAVECIERRA
           {
-              std::cout << "Evento"<<std::endl;
+              std::cout << "--Evento"<<std::endl;
           }
- EVENTOBUSQUEDA:  evento LLAVEABRE  CALENDARID   PARAMETROSN  LLAVECIERRA
+ EVENTOBUSQUEDA:  evento LLAVEABRE  CALENDARID   PARAMETROSB  LLAVECIERRA
                   {
-                    std::cout << "Evento Búsqueda"<<std::endl;
+                    std::cout << "--Evento Búsqueda"<<std::endl;
                   }
  CALENDARIO:  calendario LLAVEABRE  PARAMETROSCALENDARIO  LLAVECIERRA
               {
-                std::cout << "Calendario"<<std::endl;
+                std::cout << "--Calendario"<<std::endl;
               }
- PARAMETROSN:	nombre DOSPUNTOS STRING PUNTOCOMA
-	             descripcion DOSPUNTOS STRING PUNTOCOMA
-	             inicio DOSPUNTOS COMILLAS TIEMPO COMILLAS PUNTOCOMA
-	             fin DOSPUNTOS COMILLAS TIEMPO COMILLAS PUNTOCOMA
-	             recordatorio DOSPUNTOS COMILLAS FLOAT COMILLAS PUNTOCOMA
+ INICIOFIN: inicio DOSPUNTOS COMILLASIMPLE TIEMPO COMILLASIMPLE PUNTOCOMA
+            fin DOSPUNTOS COMILLASIMPLE TIEMPO COMILLASIMPLE PUNTOCOMA
+            {
+              std::cout << "--InicioFin" << std::endl;
+            }
+ PARAMETROSB: nombre DOSPUNTOS ALPHANUM PUNTOCOMA PARAMETROSB
               {
-                std::cout << "Parametros necesarios"<<std::endl;
+                std::cout << "--(Optional search) nombre"<<std::endl;
+              }   
+              |descripcion DOSPUNTOS ALPHANUM PUNTOCOMA PARAMETROSB
+              {
+                std::cout << "--(Optional search) descripcion"<<std::endl;
+              }   
+              |INICIOFIN PARAMETROSB
+              {
+                std::cout << "--(Optional search) Inicio y Fin"<<std::endl;
+              }   
+              |
+              {
+                std::cout << "--Parametros search empty"<<std::endl;
+              }              
+ PARAMETROSN:	nombre DOSPUNTOS ALPHANUM PUNTOCOMA
+	             descripcion DOSPUNTOS ALPHANUM PUNTOCOMA
+	             inicio DOSPUNTOS COMILLASIMPLE TIEMPO COMILLASIMPLE PUNTOCOMA
+	             fin DOSPUNTOS COMILLASIMPLE TIEMPO COMILLASIMPLE PUNTOCOMA
+	             recordatorio DOSPUNTOS FLOAT PUNTOCOMA
+              {
+                std::cout << "--Parametros necesarios"<<std::endl;
               }
- PARAMETROSO:  lugar DOSPUNTOS STRING PUNTOCOMA  PARAMETROSO
+ PARAMETROSO:  lugar DOSPUNTOS ALPHANUM PUNTOCOMA  PARAMETROSO
                 {
-                  std::cout << "(Opcional) lugar"<<std::endl;
+                  std::cout << "--(Opcional) lugar"<<std::endl;
                 }
-                |archivo DOSPUNTOS STRING PUNTOCOMA  PARAMETROSO
+                |archivo DOSPUNTOS URL PUNTOCOMA  PARAMETROSO
                 {
-                  std::cout << "(Opcional) archivo"<<std::endl;
+                  std::cout << "--(Opcional) archivo"<<std::endl;
                 }
                 |invitados DOSPUNTOS REGLAMAIL PUNTOCOMA  PARAMETROSO
                 {
-                  std::cout << "(Opcional) invitados"<<std::endl;
+                  std::cout << "--(Opcional) invitados"<<std::endl;
                 }
-                |zona DOSPUNTOS COMILLAS ZONA COMILLAS PUNTOCOMA  PARAMETROSO
+                |zona DOSPUNTOS COMILLASIMPLE ZONA COMILLASIMPLE PUNTOCOMA  PARAMETROSO
                 {
-                  std::cout << "(Opcional) zona"<<std::endl;
+                  std::cout << "--(Opcional) zona"<<std::endl;
                 }
                 | 
                 {
-                  std::cout << "(Opcional) empty parms"<<std::endl;
+                  std::cout << "--(Opcional) empty parms"<<std::endl;
                 }
- PARAMETROSCALENDARIO:  nombre DOSPUNTOS STRING PUNTOCOMA descripcion DOSPUNTOS STRING PUNTOCOMA
+ PARAMETROSCALENDARIO:  nombre DOSPUNTOS ALPHANUM PUNTOCOMA descripcion DOSPUNTOS ALPHANUM PUNTOCOMA
                         {
-                          std::cout << "Params calendario: Nombre y descripción"<<std::endl;
+                          std::cout << "--Params calendario: Nombre y descripción"<<std::endl;
                         }
-                        |nombre DOSPUNTOS STRING PUNTOCOMA
+                        |nombre DOSPUNTOS ALPHANUM PUNTOCOMA
                         {
-                          std::cout << "Params calendario: Nombre"<<std::endl;
+                          std::cout << "--Params calendario: Nombre"<<std::endl;
                         }
  CONSULTAR:  consultar  EVENTOBUSQUEDA
               {
-                std::cout << "Consultar evento"<<std::endl;
+                std::cout << "--Consultar evento"<<std::endl;
               }
  MODIFICAR:  modificar  EVENTO
               {
-                std::cout << "Modificar evento"<<std::endl;
+                std::cout << "--Modificar evento"<<std::endl;
               }
  ELIMINAR:  eliminar evento LLAVEABRE  CALENDARID   EVENTID  LLAVECIERRA
             {
-              std::cout << "Eliminar evento"<<std::endl;
+              std::cout << "--Eliminar evento"<<std::endl;
             }
  CREAR: crear  EVENTO
         {
-          std::cout << "Crear evento"<<std::endl;
+          std::cout << "--Crear evento"<<std::endl;
         }
         | crear  CALENDARIO
         {
-          std::cout << "Crear calendario"<<std::endl;
+          std::cout << "--Crear calendario"<<std::endl;
         }
  FUNCIONES:   CREAR   FUNCIONES
               {
-                std::cout << "Crear funciones"<<std::endl;
+                std::cout << "--Crear funciones"<<std::endl;
               }
               | CONSULTAR   FUNCIONES 
               {
-                std::cout << "Consultar funciones"<<std::endl;
+                std::cout << "--Consultar funciones"<<std::endl;
               }
               | MODIFICAR   FUNCIONES
               {
-                std::cout << "Modificar funciones"<<std::endl;
+                std::cout << "--Modificar funciones"<<std::endl;
               }
               | ELIMINAR   FUNCIONES
               {
-                std::cout << "Eliminar funciones"<<std::endl;
+                std::cout << "--Eliminar funciones"<<std::endl;
               }
               | 
               {
-                std::cout << "Funciones empty"<<std::endl;
+                std::cout << "--Funciones empty"<<std::endl;
               }
 %%
 //-- FUNCTION DEFINITIONS ---------------------------------
