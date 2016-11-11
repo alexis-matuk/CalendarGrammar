@@ -1,145 +1,137 @@
 <html>
-  <head>
-    <script type="text/javascript">
-      // Your Client ID can be retrieved from your project in the Google
-      // Developer Console, https://console.developers.google.com
-      var calendar = "primary";
 
-      var CLIENT_ID = '1031197866962-dclqkq813h9buc56on07l2rd2cje81rk.apps.googleusercontent.com';
+<head>
+  <script type="text/javascript">
+    // Your Client ID can be retrieved from your project in the Google
+    // Developer Console, https://console.developers.google.com
+    var calendar = "primary";
 
-      var API_KEY = 'AIzaSyCHiyDWn6pKd44YaytzmbcuOMasRaea-y0';
+    var CLIENT_ID = '1031197866962-dclqkq813h9buc56on07l2rd2cje81rk.apps.googleusercontent.com';
 
-      var SCOPES = ["https://www.googleapis.com/auth/calendar.readonly", "https://www.googleapis.com/auth/calendar"];
+    var API_KEY = 'AIzaSyCHiyDWn6pKd44YaytzmbcuOMasRaea-y0';
 
-      function handleLoad(){
-        gapi.client.setApiKey(API_KEY);
-        checkAuth();
+    var SCOPES = ["https://www.googleapis.com/auth/calendar.readonly", "https://www.googleapis.com/auth/calendar"];
+
+    function handleLoad() {
+      gapi.client.setApiKey(API_KEY);
+      checkAuth();
+    }
+
+    function checkAuth() {
+      gapi.auth.authorize({
+        'client_id': CLIENT_ID,
+        'scope': SCOPES.join(' '),
+        'immediate': true
+      }, handleAuthResult);
+    }
+
+    function handleAuthResult(authResult) {
+      var authorizeDiv = document.getElementById('authorize-div');
+      if (authResult && !authResult.error) {
+        authorizeDiv.style.display = 'none';
+        gapi.client.load('calendar', 'v3').then(function() {
+          callFunctions();
+        });
+      } else {
+        authorizeDiv.style.display = 'inline';
       }
+    }
 
-      function checkAuth() {
-        gapi.auth.authorize(
-          {
-            'client_id': CLIENT_ID,
-            'scope': SCOPES.join(' '),
-            'immediate': true
-          }, handleAuthResult);
-      }
+    function callFunctions() {
+      createEvent();
+      getEvent();
+    }
 
-      function handleAuthResult(authResult) {
-        var authorizeDiv = document.getElementById('authorize-div');
-        if (authResult && !authResult.error) {
-          authorizeDiv.style.display = 'none';
-          gapi.client.load('calendar', 'v3').then(function(){
-            callFunctions();
-          });                
-        } else {
-          authorizeDiv.style.display = 'inline';
+    function createEvent() {
+      var event = {
+        'summary': 'Dentista',
+        'description': 'Visita el dentista',
+        'start': {
+          'dateTime': '2016-09-19T16:00:00',
+          'timeZone': 'America/Mexico_City'
+        },
+        'end': {
+          'dateTime': '2016-09-19T16:30:00',
+          'timeZone': 'America/Mexico_City'
+        },
+        'reminders': {
+          'useDefault': false,
+          'overrides': [{
+            'method': 'email',
+            'minutes': 24 * 60
+          }, ]
         }
-      }
+      };
 
-      function callFunctions(){
-        createEvent();
-        getEvent();
-      }
+      var request = gapi.client.calendar.events.insert({
+        'calendarId': calendar,
+        'resource': event
+      });
 
-      function createEvent(){
-        var event = {
-          'summary': 'Dentista',
-          'description': 'Visita el dentista',
-          'start': {
-            'dateTime': '2016-09-19T16:00:00',
-            'timeZone': 'America/Mexico_City'
-          },
-          'end': {
-            'dateTime': '2016-09-19T16:30:00',
-            'timeZone': 'America/Mexico_City'
-          },
-          'reminders': {
-            'useDefault': false,
-            'overrides': [
-              {'method': 'email', 'minutes': 24 * 60},
-            ]
-          }
-        };
+      request.execute(function(event) {
+        appendPre('Event created: ' + event.htmlLink);
+      });
 
-        var request = gapi.client.calendar.events.insert({
-          'calendarId': calendar,
-          'resource': event
-        });
+    }
 
-        request.execute(function(event) {
-          appendPre('Event created: ' + event.htmlLink);
-        });
+    function getEvent() {
+      var query = {
+        'calendarId': calendar
+      };
 
-      }
+      var request = gapi.client.calendar.events.list(query);
 
-      function getDate(dateTime){
-        var index = dateTime.indexOf("T");
-        var substring = dateTime.substring(0,index);
-        return substring;
-      }
-
-      function getEvent(){
-        var query ={
-          'calendarId':  calendar
-        };
-
-        var request = gapi.client.calendar.events.list(query);
-
-        request.execute(function(event) {
-          console.log(event);
-          appendPre("Eventos encontrados en la fecha 12/09/2016");
-          for(var i = 0; i < event.items.length; i++)
-          {
-            if(event.items[i].start.date)
-            {
-              var compare = new Date('2016-09-12');
-              var result = new Date(event.items[i].start.date);
-              if(compare.getTime() == result.getTime())
-              {
-                appendPre(JSON.stringify(event.items[i], null, "\t"));
-              }
+      request.execute(function(event) {
+        console.log(event);
+        appendPre("Eventos encontrados en la fecha 12/09/2016");
+        for (var i = 0; i < event.items.length; i++) {
+          if (event.items[i].start.date) {
+            var compare = new Date('2016-09-12');
+            var result = new Date(event.items[i].start.date);
+            if (compare.getTime() == result.getTime()) {
+              appendPre(JSON.stringify(event.items[i], null, "\t"));
             }
-            else if(event.items[i].start.dateTime)
-            {
-              var compare = new Date('2016-09-12');
-              var result = new Date(event.items[i].start.dateTime);
-              if(compare.getTime() == result.getTime())
-              {
-                appendPre(JSON.stringify(event.items[i], null, "\t"));
-                
-              }
+          } else if (event.items[i].start.dateTime) {
+            var compare = new Date('2016-09-12');
+            var result = new Date(event.items[i].start.dateTime);
+            if (compare.getTime() == result.getTime()) {
+              appendPre(JSON.stringify(event.items[i], null, "\t"));
+
             }
           }
-        });
+        }
+      });
 
-      }
+    }
 
-      function handleAuthClick(event) {
-        gapi.auth.authorize(
-          {client_id: CLIENT_ID, scope: SCOPES, immediate: false},
-          handleAuthResult);
-        return false;
-      }
-      
+    function handleAuthClick(event) {
+      gapi.auth.authorize({
+          client_id: CLIENT_ID,
+          scope: SCOPES,
+          immediate: false
+        },
+        handleAuthResult);
+      return false;
+    }
 
-      function appendPre(message) {
-        var pre = document.getElementById('output');
-        var textContent = document.createTextNode(message + '\n');
-        pre.appendChild(textContent);
-      }
 
-    </script>
-    <script src="https://apis.google.com/js/client.js?onload=handleLoad">
-    </script>
-  </head>
-  <body>
-    <div id="authorize-div" style="display: none">
-      <span>Authorize access to Google Calendar API</span>
-      <button id="authorize-button" onclick="handleAuthClick(event)">
-        Authorize
-      </button>
-    </div>
-    <pre id="output"></pre>
-  </body>
+    function appendPre(message) {
+      var pre = document.getElementById('output');
+      var textContent = document.createTextNode(message + '\n');
+      pre.appendChild(textContent);
+    }
+  </script>
+  <script src="https://apis.google.com/js/client.js?onload=handleLoad">
+  </script>
+</head>
+
+<body>
+  <div id="authorize-div" style="display: none">
+    <span>Authorize access to Google Calendar API</span>
+    <button id="authorize-button" onclick="handleAuthClick(event)">
+      Authorize
+    </button>
+  </div>
+  <pre id="output"></pre>
+</body>
 </html>

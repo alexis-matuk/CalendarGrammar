@@ -3,177 +3,1096 @@
 #include <stdio.h>
 #include <string>
 #include <cstdlib>
+#include <map>
+#include <fstream>
+#include <vector>
+#include <sstream>
 using namespace std;
 
 extern FILE *yyin;
 int yylex(); 
 int yyerror(const char *p) { cerr << "Error with source!" << endl; return 0; }
+
+struct DateTime{
+  int day;
+  int month;
+  int year;
+  int hours;
+  int minutes;
+  int seconds;
+  bool hasTime;
+};
+
+map<string,int> dateMap;
+map<string, bool> parameterCounter;
+map<string, int> variableCounter;
+std::fstream file;
+bool hasNombre, hasDescripcion, hasInicio, hasFin = false;
+//{lugar, archivo, invitados, zona}
 %}
 
 //-- SYMBOL SEMANTIC VALUES -----------------------------
 %union {
   int val;
+  char* lexema;
+  float valF;
+  struct dateTime{
+    char* lexema;
+    int type;
+  } time; 
+
+  struct ParametrosB{
+    char* _nombre;    
+    char* _descripcion;
+    dateTime _inicio;
+    dateTime _fin;
+  }paramsB;
+
+  struct ParametrosN{
+    char* _nombre;
+    char* _descripcion;
+    dateTime _inicio;
+    dateTime _fin;
+    float _recordatorio;
+    char* _event_id;
+  } paramsN;
+
+  struct ParametrosO{
+    char* _lugar;
+    char* _archivo;
+    char* _invitados;
+    char* _zona;    
+  } paramsO;
+
+  struct ParametrosCalendario{
+    char* _nombre;
+    char* _descripcion;
+  }paramsC;
+
+  struct Event{
+    char* lexema;
+    char* _calendar_id;
+    char* _event_id;
+  } event;  
+
 };
-%token <val> program identifier calendar_id api_key event_id declare calendario user_id permissions crear consultar modificar eliminar evento nombre descripcion inicio fin zona recordatorio invitados lugar archivo READ WRITE ZONA HORA FECHA FLOAT MAIL LLAVEABRE LLAVECIERRA IGUAL DOSPUNTOS PUNTOCOMA COMA COMILLASIMPLE ID ALPHANUM AND URL
-%type  <val> PROGRAM PERMISSION SETUP CALENDARID EVENTID TIEMPO EVENTO EVENTOBUSQUEDA CALENDARIO PARAMETROSN PARAMETROSO PARAMETROSCALENDARIO CONSULTAR MODIFICAR ELIMINAR CREAR FUNCIONES
+%token <val> program calendar_id api_key event_id declare calendario user_id permissions crear consultar modificar eliminar evento nombre descripcion inicio fin zona recordatorio invitados lugar archivo LLAVEABRE LLAVECIERRA IGUAL DOSPUNTOS PUNTOCOMA COMA COMILLASIMPLE ID AND
+%token <lexema> FECHANUM FECHASTRING HORA ALPHANUM READ WRITE ZONA MAIL URL ALPHANUMEVENTID
+%token <valF> FLOAT
+%type <paramsB> PARAMETROSB
+%type  <val> PROGRAM SETUP MODIFICAR ELIMINAR CREAR FUNCIONES CONSULTAR
+%type <time> TIEMPOINICIO TIEMPOFIN
+%type <lexema> PERMISSION REGLAMAIL CALENDARID CALENDARIO EVENTID
+%type <paramsN> PARAMETROSN
+%type <paramsO> PARAMETROSO
+%type <paramsC> PARAMETROSCALENDARIO
+%type <event> EVENTO
+
+%{
+  DateTime getDateFromString(string date, int type);
+  bool isDateValid(YYSTYPE::dateTime start, YYSTYPE::dateTime end);
+  int strpos(string haystack, char needle, int nth);
+  bool isRealDate(int day, int month, int year);
+  void initMap(std::map<string, int> & map);
+  bool isLogicalDate(DateTime startDate, DateTime endDate);
+  void openFile(std::fstream & _file, std::string route); 
+  void split(const std::string &s, char delim, std::vector<std::string> &elems); 
+  std::vector<std::string> split(std::string &s, char delim);
+  string getTime(DateTime date);
+  void freeStr(char **str);
+%}
 //-- GRAMMAR RULES ---------------------------------------
 %%
  PROGRAM: program ALPHANUM LLAVEABRE SETUP FUNCIONES LLAVECIERRA 
-  {
+  {        
+    file << "}" << std::endl;
+
+    file << "function handleAuthClick(event) {" << std::endl;
+    file << "      gapi.auth.authorize({" << std::endl;
+    file << "          client_id: CLIENT_ID," << std::endl;
+    file << "          scope: SCOPES," << std::endl;
+    file << "          immediate: false" << std::endl;
+    file << "        }," << std::endl;
+    file << "        handleAuthResult);" << std::endl;
+    file << "      return false;" << std::endl;
+    file << "    }" << std::endl;
+    file << "function appendPre(message) {" << std::endl;
+    file << "      var pre = document.getElementById('output');" << std::endl;
+    file << "      var textContent = document.createTextNode(message + '\\n');" << std::endl;
+    file << "      pre.appendChild(textContent);" << std::endl;
+    file << "    }" << std::endl;
+
+    file << "  </script>" << std::endl;
+    file << "  <script src=\"https://apis.google.com/js/client.js?onload=handleLoad\">" << std::endl;
+    file << "  </script>" << std::endl;
+    file << "</head>" << std::endl;    
+    file << "<body>" << std::endl;
+    file << "  <div id=\"authorize-div\" style=\"display: none\">" << std::endl;
+    file << "    <span>Authorize access to Google Calendar API</span>" << std::endl;
+    file << "    <button id=\"authorize-button\" onclick=\"handleAuthClick(event)\">" << std::endl;
+    file << "      Authorize" << std::endl;
+    file << "    </button>" << std::endl;
+    file << "  </div>" << std::endl;
+    file << "  <pre id=\"output\"></pre>" << std::endl;
+    file << "</body>" << std::endl;
+    file << "</html>" << std::endl;
     std::cout << "--program->program ALPHANUM {setup funciones}"<<std::endl;
   }
  PERMISSION: READ 
-              {
+              {      
+                string res = "R";  
+                $$ = new char[res.length()+1];
+                strcpy($$, res.c_str());
                 std::cout << "--Read permissions"<<std::endl;
               }
               | READ AND WRITE 
-              {
+              {  
+                string res = "R W";
+                $$ = new char[res.length()+1];
+                strcpy($$, res.c_str());
                 std::cout << "--Read, write permissions"<<std::endl;
               }
  SETUP:  declare user_id IGUAL ALPHANUM PUNTOCOMA
           declare api_key IGUAL ALPHANUM PUNTOCOMA
            declare permissions IGUAL COMILLASIMPLE PERMISSION COMILLASIMPLE PUNTOCOMA
             {
+              string _user_id = string($4);
+              string _api_key = string($9);              
+              string _permission;
+              if(string($15) == "R")
+                _permission = "\"https://www.googleapis.com/auth/calendar.readonly\"";
+              else
+                _permission = "\"https://www.googleapis.com/auth/calendar.readonly\", \"https://www.googleapis.com/auth/calendar\"";
+
+              file << "<html>" << std::endl;
+              file << " <head>" << std::endl;
+              file << "   <script type=\"text/javascript\">" << std::endl;              
+              file << "   var CLIENT_ID = "+_user_id+";" << std::endl;
+              file << "   var API_KEY = "+_api_key+";" << std::endl;
+              file << "   var SCOPES = ["+_permission+"];" << std::endl; 
+              file << "function handleLoad() {" << std::endl;
+              file << "      gapi.client.setApiKey(API_KEY);" << std::endl;
+              file << "      checkAuth();" << std::endl;
+              file << "    }" << std::endl;
+              file << "function checkAuth() {" << std::endl;
+              file << "      gapi.auth.authorize({" << std::endl;
+              file << "        'client_id': CLIENT_ID," << std::endl;
+              file << "        'scope': SCOPES.join(' ')," << std::endl;
+              file << "        'immediate': true" << std::endl;
+              file << "      }, handleAuthResult);" << std::endl;
+              file << "    }" << std::endl;
+              file << "function handleAuthResult(authResult) {" << std::endl;
+              file << "      var authorizeDiv = document.getElementById('authorize-div');" << std::endl;
+              file << "      if (authResult && !authResult.error) {" << std::endl;
+              file << "        authorizeDiv.style.display = 'none';" << std::endl;
+              file << "        gapi.client.load('calendar', 'v3').then(function() {" << std::endl;
+              file << "          callFunctions();" << std::endl;
+              file << "        });" << std::endl;
+              file << "      } else {" << std::endl;
+              file << "        authorizeDiv.style.display = 'inline';" << std::endl;
+              file << "      }" << std::endl;
+              file << "    }" << std::endl;    
+              file << "function callFunctions() {" << std::endl;
+              file << std::endl;
+              std::cout << "@@@@@@@@@@@" << std::endl;              
               std::cout << "--Declare Setup"<<std::endl;
             }
- CALENDARID:  identifier DOSPUNTOS ALPHANUM PUNTOCOMA
+ CALENDARID:  calendar_id DOSPUNTOS ALPHANUM PUNTOCOMA
               {
+                string res = string($3);
+                $$ = new char[res.length()+1];
+                strcpy($$, res.c_str());                
                 std::cout << "--CalendarId"<<std::endl;
               }
-              | {
-                  std::cout << "--Empty CalendarId"<<std::endl;
-                }
- EVENTID:  identifier DOSPUNTOS ALPHANUM PUNTOCOMA
+              | /* empty */
+              {
+                string res = "'primary'";
+                $$ = new char[res.length()+1];
+                strcpy($$, res.c_str()); 
+                std::cout << "--Empty CalendarId"<<std::endl;
+              }
+ EVENTID:  event_id DOSPUNTOS ALPHANUMEVENTID PUNTOCOMA
             {
+              string _event_id = string($3);
+              $$ = new char[_event_id.length()+1];
+              strcpy($$, _event_id.c_str());
               std::cout << "--EventId"<<std::endl;
             }
- TIEMPO:  FECHA
+ TIEMPOINICIO:  FECHANUM
           {
-            std::cout << "--Fecha"<<std::endl;
+            string res = string($1);
+            $$.lexema = new char[res.length()+1];
+            strcpy($$.lexema, res.c_str());
+            $$.type = 1;
+            std::cout << "--Fecha num"<<std::endl;            
           }
-          |FECHA HORA
+          |FECHANUM HORA
           {
-              std::cout << "--Fecha Hora"<<std::endl;
+            string s1 = string($1);
+            string s2 = string($2);
+            string res = s1 + " " + s2;
+            $$.lexema = new char[res.length()+1];
+            strcpy($$.lexema, res.c_str());
+            $$.type = 2;
+            std::cout << "--Fecha num Hora"<<std::endl;
+          }
+          |FECHASTRING HORA
+          {
+            string s1 = string($1);
+            string s2 = string($2);
+            string res = s1 + " " + s2;
+            $$.lexema = new char[res.length()+1];
+            strcpy($$.lexema, res.c_str());           
+            $$.type = 3;
+            std::cout << "--Fecha string Hora"<<std::endl;
+          }
+  TIEMPOFIN:  FECHANUM
+          {
+            string res = string($1);
+            $$.lexema = new char[res.length()+1];
+            strcpy($$.lexema, res.c_str());            
+            $$.type = 1;
+            std::cout << "--Fecha num"<<std::endl;            
+          }
+          |FECHANUM HORA
+          {
+            string s1 = string($1);
+            string s2 = string($2);
+            string res = s1 + " " + s2;
+            $$.lexema = new char[res.length()+1];
+            strcpy($$.lexema, res.c_str());            
+            $$.type = 2;            
+            std::cout << "--Fecha num Hora"<<std::endl;             
+          }
+          |FECHASTRING HORA
+          {
+            string s1 = string($1);
+            string s2 = string($2);
+            string res = s1 + " " + s2;
+            $$.lexema = new char[res.length()+1];
+            strcpy($$.lexema, res.c_str());           
+            $$.type = 3;            
+            std::cout << "--Fecha string Hora"<<std::endl;                                   
           }
  REGLAMAIL:  COMILLASIMPLE MAIL COMILLASIMPLE COMA  REGLAMAIL
             {
-              std::cout << "--Mail repetido"<<std::endl;
+              string current = string($$);
+              current += string($2) + ", ";
+              $$ = new char[current.length()+1];
+              strcpy($$, current.c_str());
+              std::cout << "--Mail repetido"<<std::endl; 
             }
             | COMILLASIMPLE MAIL COMILLASIMPLE
-            {
-              std::cout << "--Mail"<<std::endl;
+            {                            
+              string current = "'"+string($2)+"'";
+              $$ = new char[current.length()+1];
+              strcpy($$, current.c_str());
+              std::cout << "--Mail"<<std::endl;    
             }
- EVENTO:  evento LLAVEABRE  CALENDARID   PARAMETROSN   PARAMETROSO  LLAVECIERRA
-          {
-              std::cout << "--Evento"<<std::endl;
+ EVENTO:  evento LLAVEABRE CALENDARID PARAMETROSN PARAMETROSO LLAVECIERRA
+          {   
+            string _calendar_id = string($3);
+            string _nombre = string($4._nombre);
+            string _descripcion = string($4._descripcion);
+            DateTime _inicio = getDateFromString($4._inicio.lexema, $4._inicio.type);
+            DateTime _fin = getDateFromString($4._fin.lexema, $4._fin.type);                              
+            string _event_id = string($4._event_id);
+            ostringstream ss;            
+            ss << "var event"<< variableCounter["event"] << " = {          " << std::endl;
+            ss << "  'summary': "<< _nombre <<" ," << std::endl;
+            ss << "  'description': "<< _descripcion << "," << std::endl;
+            ss << "  'id': " << _event_id << "," << std::endl;
+            ss << "  'start': {" << std::endl;
+
+            if(_inicio.hasTime)
+            {
+              string actualTime = getTime(_inicio);
+              ss << "    'dateTime': '"<< _inicio.year << "-" << _inicio.month << "-" << _inicio.day << "T" << actualTime <<"'," << std::endl;
+            }
+            else
+            {
+              ss << "    'date': '"<< _inicio.year << "-" << _inicio.month << "-" << _inicio.day << "'," << std::endl;
+            }
+
+            if($5._zona != NULL && strlen($5._zona) != 0)
+            {
+              ss << "    'timeZone': '"<< string($5._zona) << "'" << std::endl;
+            }   
+            else
+            {
+              ss << "    'timeZone': 'America/Mexico_City'" << std::endl;
+            }         
+            ss << "  }," << std::endl;
+            ss << "  'end': {" << std::endl;
+            if(_fin.hasTime)
+            {
+              string actualTime = getTime(_fin);
+              ss << "    'dateTime': '"<< _fin.year << "-" << _fin.month << "-" << _fin.day << "T" << actualTime <<"'," << std::endl;
+            }
+            else
+            {
+              ss << "    'date': '"<< _fin.year << "-" << _fin.month << "-" << _fin.day << "'," << std::endl;
+            }            
+            if($5._zona != NULL && strlen($5._zona) != 0)
+            {
+              ss << "    'timeZone': '"<< string($5._zona) << "'" << std::endl;
+            }   
+            else
+            {
+              ss << "    'timeZone': 'America/Mexico_City'" << std::endl;
+            }  
+            ss << "  }";
+            ss << ",";
+            ss << "'reminders': {" << std::endl;
+            ss << "    'useDefault': false," << std::endl;
+            ss << "    'overrides': [" << std::endl;
+            ss << "      {'method': 'email', 'minutes': "<< $4._recordatorio <<"*60}," << std::endl;
+            ss << "    ]" << std::endl;
+            ss << "  }";              
+            if($5._invitados != NULL && strlen($5._invitados) != 0) 
+            {
+              string _invitados = string($5._invitados);
+              std::vector<std::string> mails;
+              if(_invitados.find(",") != std::string::npos)
+                mails = split(_invitados, ',');
+              else
+                mails.push_back(_invitados);
+              ss << "   ,";
+              ss << "'attendees': [" << std::endl;
+              for(int i = 0; i < mails.size(); i++)
+              { 
+                if(i+1 >= mails.size())
+                  ss << "    {'email': " << mails[i] << "}" << std::endl;
+                else
+                  ss << "    {'email': " << mails[i] << "}," << std::endl;
+              }
+              ss << "  ]" << std::endl;
+            } 
+            if($5._archivo != NULL && strlen($5._archivo) != 0) 
+            {
+              ss << "   ,";
+              ss << "'attachments':[" << std::endl;
+              ss << "    {'fileUrl': 'https://drive.google.com/file/d/0B8TFgB_0zcIIZEFpbENoaVBYNlE/view'}" << std::endl;
+            }                               
+            ss << "  ]" << std::endl;
+            ss << "};" << std::endl;
+
+            $$.lexema = new char[ss.str().length()+1];
+            strcpy($$.lexema, ss.str().c_str());            
+
+            $$._calendar_id = new char[_calendar_id.length()+1];
+            strcpy($$._calendar_id, _calendar_id.c_str());
+
+            $$._event_id = new char[_event_id.length()+1];
+            strcpy($$._event_id, _event_id.c_str());
+
+            std::cout << "--Evento"<<std::endl;
+            for(std::map<string, bool>::iterator it = parameterCounter.begin(); it != parameterCounter.end(); ++it)
+            {
+              it->second = false;
+            }
           }
- EVENTOBUSQUEDA:  evento LLAVEABRE  CALENDARID   PARAMETROSB  LLAVECIERRA
-                  {
-                    std::cout << "--Evento Búsqueda"<<std::endl;
-                  }
+
  CALENDARIO:  calendario LLAVEABRE  PARAMETROSCALENDARIO  LLAVECIERRA
               {
+                string _nombre = string($3._nombre);
+                ostringstream ss;               
+                ss << " var resource"<< variableCounter["resource"] << " = {" << std::endl;
+                ss << "   \"summary\": "<< _nombre;
+                if($3._descripcion != NULL && strlen($3._descripcion) != 0)
+                {
+                  ss << "," << std::endl;
+                  ss << "   \"description\": "<<string($3._descripcion);
+                }            
+                ss << std::endl;    
+                ss << " };" << std::endl; 
+                $$ = new char[ss.str().length()+1];
+                strcpy($$, ss.str().c_str());
                 std::cout << "--Calendario"<<std::endl;
-              }
- INICIOFIN: inicio DOSPUNTOS COMILLASIMPLE TIEMPO COMILLASIMPLE PUNTOCOMA
-            fin DOSPUNTOS COMILLASIMPLE TIEMPO COMILLASIMPLE PUNTOCOMA
-            {
-              std::cout << "--InicioFin" << std::endl;
-            }
- PARAMETROSB: nombre DOSPUNTOS ALPHANUM PUNTOCOMA PARAMETROSB
-              {
-                std::cout << "--(Optional search) nombre"<<std::endl;
-              }   
-              |descripcion DOSPUNTOS ALPHANUM PUNTOCOMA PARAMETROSB
-              {
-                std::cout << "--(Optional search) descripcion"<<std::endl;
-              }   
-              |INICIOFIN PARAMETROSB
-              {
-                std::cout << "--(Optional search) Inicio y Fin"<<std::endl;
-              }   
-              |
-              {
-                std::cout << "--Parametros search empty"<<std::endl;
-              }              
- PARAMETROSN:	nombre DOSPUNTOS ALPHANUM PUNTOCOMA
+              }        
+ PARAMETROSN:	
+              event_id DOSPUNTOS ALPHANUMEVENTID PUNTOCOMA
+              nombre DOSPUNTOS ALPHANUM PUNTOCOMA
 	             descripcion DOSPUNTOS ALPHANUM PUNTOCOMA
-	             inicio DOSPUNTOS COMILLASIMPLE TIEMPO COMILLASIMPLE PUNTOCOMA
-	             fin DOSPUNTOS COMILLASIMPLE TIEMPO COMILLASIMPLE PUNTOCOMA
+	             inicio DOSPUNTOS COMILLASIMPLE TIEMPOINICIO COMILLASIMPLE PUNTOCOMA
+	             fin DOSPUNTOS COMILLASIMPLE TIEMPOFIN COMILLASIMPLE PUNTOCOMA
 	             recordatorio DOSPUNTOS FLOAT PUNTOCOMA
               {
+                if(isDateValid($16, $22))
+                {
+                  string _nombre = string($7);
+                  string _descripcion = string($11);                                  
+                  YYSTYPE::dateTime _inicio = $16;
+                  YYSTYPE::dateTime _fin = $22;
+                  float _recordatorio = $27;
+
+                  $$._nombre = new char[_nombre.length()+1];
+                  strcpy($$._nombre, _nombre.c_str());
+
+                  $$._descripcion = new char[_descripcion.length()+1];
+                  strcpy($$._descripcion, _descripcion.c_str());
+
+                  $$._inicio.lexema = new char[string(_inicio.lexema).length()+1];                  
+                  $$._inicio.type = _inicio.type;
+                  $$._inicio.lexema = _inicio.lexema;
+
+                  $$._fin.lexema = new char[string(_fin.lexema).length()+1];
+                  $$._fin.lexema = _fin.lexema;
+                  $$._fin.type = _fin.type;
+
+                  $$._recordatorio = _recordatorio;    
+                  string _event_id = string($3);   
+                  if(_event_id.length() >= 5 && _event_id.length() <= 1024)
+                  {
+                    $$._event_id = new char[_event_id.length()+1];
+                    strcpy($$._event_id, _event_id.c_str());
+                  } 
+                  else
+                  {
+                    std::cout << "'event id' debe ser de 5 a 1024 caracteres, de la a-v y de 0-9" << std::endl; 
+                    exit(-1);
+                  }
+                  std::cout << "--InicioFin" << std::endl;  
+                }   
+                else
+                {
+                  std::cout << "ERROR => tiempo con límites incorrectos" << std::endl;                
+                  exit(-1);
+                }   
                 std::cout << "--Parametros necesarios"<<std::endl;
               }
- PARAMETROSO:  lugar DOSPUNTOS ALPHANUM PUNTOCOMA  PARAMETROSO
+ PARAMETROSO:  lugar DOSPUNTOS ALPHANUM PUNTOCOMA PARAMETROSO
                 {
+                  if(!parameterCounter["lugar"])
+                  {           
+                    string _lugar = string($3);                                                               
+
+                    $$._lugar = new char[_lugar.length()+1];
+                    strcpy($$._lugar, _lugar.c_str());
+
+                    if($5._archivo != NULL && strlen($5._archivo) != 0)
+                    {
+                      $$._archivo = new char[string($5._archivo).length()+1];
+                      $$._archivo = $5._archivo; 
+                    }
+
+                    if($5._zona != NULL && strlen($5._zona) != 0)
+                    {
+                      $$._zona = new char[string($5._zona).length()+1];
+                      $$._zona = $5._zona; 
+                    } 
+
+                    if($5._invitados != NULL && strlen($5._invitados) != 0)
+                    {
+                      $$._invitados = new char[string($5._invitados).length()+1];
+                      $$._invitados = $5._invitados;  
+                    }              
+
+                    parameterCounter["lugar"] = true;    
+                    std::cout << string($$._lugar) << std::endl;                                   
+                  }
+                  else
+                  {
+                    std::cout << "'Lugar' no puede ser definido dos veces" << std::endl;
+                    exit(-1);
+                  }
                   std::cout << "--(Opcional) lugar"<<std::endl;
                 }
-                |archivo DOSPUNTOS URL PUNTOCOMA  PARAMETROSO
+                |archivo DOSPUNTOS URL PUNTOCOMA PARAMETROSO
                 {
+                  if(!parameterCounter["archivo"])
+                  {       
+                    string _archivo = string($3);                     
+                    $$._archivo = new char[_archivo.length()+1];
+                    strcpy($$._archivo, _archivo.c_str());                       
+                    parameterCounter["archivo"] = true;    
+                    std::cout << string($$._archivo) << std::endl;
+
+                    if($5._lugar != NULL && strlen($5._lugar) != 0)
+                    {
+                      $$._lugar = new char[string($5._lugar).length()+1];
+                      $$._lugar = $5._lugar; 
+                    }
+
+                    if($5._zona != NULL && strlen($5._zona) != 0)
+                    {
+                      $$._zona = new char[string($5._zona).length()+1];
+                      $$._zona = $5._zona; 
+                    } 
+
+                    if($5._invitados != NULL && strlen($5._invitados) != 0)
+                    {
+                      $$._invitados = new char[string($5._invitados).length()+1];
+                      $$._invitados = $5._invitados;  
+                    }  
+                  }
+                  else
+                  {
+                    std::cout << "'Archivo' no puede ser definido dos veces" << std::endl;
+                    exit(-1);
+                  }
                   std::cout << "--(Opcional) archivo"<<std::endl;
                 }
-                |invitados DOSPUNTOS REGLAMAIL PUNTOCOMA  PARAMETROSO
+                |invitados DOSPUNTOS REGLAMAIL PUNTOCOMA PARAMETROSO
                 {
+                  if(!parameterCounter["invitados"])
+                  {   
+                    string _invitados = string($3);    
+                    $$._invitados = new char[_invitados.length()+1];
+                    strcpy($$._invitados, _invitados.c_str());     
+                     
+                    parameterCounter["invitados"] = true; 
+                    std::cout << string($$._invitados) << std::endl;
+
+                    if($5._archivo != NULL && strlen($5._archivo) != 0)
+                    {
+                      $$._archivo = new char[string($5._archivo).length()+1];
+                      $$._archivo = $5._archivo; 
+                    }
+
+                    if($5._zona != NULL && strlen($5._zona) != 0)
+                    {
+                      $$._zona = new char[string($5._zona).length()+1];
+                      $$._zona = $5._zona; 
+                    } 
+
+                    if($5._invitados != NULL && strlen($5._invitados) != 0)
+                    {
+                      $$._invitados = new char[string($5._invitados).length()+1];
+                      $$._invitados = $5._invitados;  
+                    }                
+                  }
+                  else
+                  {
+                    std::cout << "'Invitados' no puede ser definido dos veces" << std::endl;
+                    exit(-1);
+                  }
                   std::cout << "--(Opcional) invitados"<<std::endl;
                 }
-                |zona DOSPUNTOS COMILLASIMPLE ZONA COMILLASIMPLE PUNTOCOMA  PARAMETROSO
+                |zona DOSPUNTOS COMILLASIMPLE ZONA COMILLASIMPLE PUNTOCOMA PARAMETROSO
                 {
+                  if(!parameterCounter["zona"])
+                  {    
+                    string _zona = string($4);   
+                    $$._zona = new char[_zona.length()+1];
+                    strcpy($$._zona, _zona.c_str());                      
+                    parameterCounter["zona"] = true;      
+                    std::cout << string($$._zona) << std::endl; 
+
+                    if($7._archivo != NULL && strlen($7._archivo) != 0)
+                    {
+                      $$._archivo = new char[string($7._archivo).length()+1];
+                      $$._archivo = $7._archivo; 
+                    }                    
+                    if($7._zona != NULL && strlen($7._zona) != 0)
+                    {
+                      $$._zona = new char[string($7._zona).length()+1];
+                      $$._zona = $7._zona; 
+                    }
+
+                    if($7._invitados != NULL && strlen($7._invitados) != 0)
+                    {
+                      $$._invitados = new char[string($7._invitados).length()+1];
+                      $$._invitados = $7._invitados; 
+                    }            
+                  }
+                  else
+                  {
+                    std::cout << "'Zona' no puede ser definido dos veces" << std::endl;
+                    exit(-1);
+                  }
                   std::cout << "--(Opcional) zona"<<std::endl;
                 }
-                | 
-                {
+                | /* empty */
+                {               
                   std::cout << "--(Opcional) empty parms"<<std::endl;
                 }
- PARAMETROSCALENDARIO:  nombre DOSPUNTOS ALPHANUM PUNTOCOMA descripcion DOSPUNTOS ALPHANUM PUNTOCOMA
+ PARAMETROSCALENDARIO:  nombre DOSPUNTOS ALPHANUM PUNTOCOMA 
+                        descripcion DOSPUNTOS ALPHANUM PUNTOCOMA
                         {
+                          string _nombre = string($3);
+                          string _descripcion = string($7);
+                          $$._nombre = new char[_nombre.length()+1];
+                          $$._descripcion = new char[_descripcion.length()+1];
+                          strcpy($$._nombre, _nombre.c_str());
+                          strcpy($$._descripcion, _descripcion.c_str());
                           std::cout << "--Params calendario: Nombre y descripción"<<std::endl;
                         }
                         |nombre DOSPUNTOS ALPHANUM PUNTOCOMA
                         {
+                          string _nombre = string($3);                          
+                          $$._nombre = new char[_nombre.length()+1];                          
+                          strcpy($$._nombre, _nombre.c_str());                          
                           std::cout << "--Params calendario: Nombre"<<std::endl;
                         }
- CONSULTAR:  consultar  EVENTOBUSQUEDA
-              {
-                std::cout << "--Consultar evento"<<std::endl;
-              }
  MODIFICAR:  modificar  EVENTO
               {
-                std::cout << "--Modificar evento"<<std::endl;
+                file << "   " <<string($2.lexema) << std::endl;
+                file << "  var request"<< variableCounter["request"] <<" = gapi.client.calendar.events.update({" << std::endl;
+                file << "    'calendarId': " << string($2._calendar_id) << "," << std::endl;
+                file << "    'eventId': " << string($2._event_id) << std::endl;
+                file << "    'supportsAttachments': true," << std::endl;
+                file << "    'resource': event"<< variableCounter["event"] << std::endl;
+                file << "  });" << std::endl;
+                file << "  request"<< variableCounter["request"] <<".execute(function(event"<<variableCounter["event"]<<") {" << std::endl;
+                file << "    appendPre('Event updated: ' + event"<< variableCounter["event"] <<".htmlLink);" << std::endl;
+                file << "  });" << std::endl;
+                file << std::endl;
+                variableCounter["event"]++;
+                variableCounter["request"]++;
+                std::cout << "--Modificar evento"<<std::endl; 
               }
- ELIMINAR:  eliminar evento LLAVEABRE  CALENDARID   EVENTID  LLAVECIERRA
-            {
+ ELIMINAR:  eliminar evento LLAVEABRE CALENDARID EVENTID  LLAVECIERRA
+            {    
+              file << " var request"<< variableCounter["request"] <<" = gapi.client.calendar.events.delete({" << std::endl;
+              file << "    'calendarId': "<< string($4) <<"," << std::endl;
+              file << "    'eventId': "<< string($5) << std::endl;
+              file << "  });" << std::endl;
+              file << std::endl;
+              file << "  request"<< variableCounter["request"] <<".execute(function(event) {" << std::endl;
+              file << "    appendPre('Event deleted');" << std::endl;
+              file << "  });" << std::endl;   
+              variableCounter["request"]++;       
               std::cout << "--Eliminar evento"<<std::endl;
             }
  CREAR: crear  EVENTO
-        {
-          std::cout << "--Crear evento"<<std::endl;
+        {          
+          file << "   " <<string($2.lexema) << std::endl;
+          file << "  var request"<< variableCounter["request"] <<" = gapi.client.calendar.events.insert({" << std::endl;
+          file << "    'calendarId': " << string($2._calendar_id) << "," << std::endl;
+          file << "    'supportsAttachments': true," << std::endl;
+          file << "    'resource': event"<< variableCounter["event"] << std::endl;
+          file << "  });" << std::endl;
+          file << "  request"<< variableCounter["request"] <<".execute(function(event"<<variableCounter["event"]<<") {" << std::endl;
+          file << "    appendPre('Event created: ' + event"<< variableCounter["event"] <<".htmlLink);" << std::endl;
+          file << "  });" << std::endl;
+          file << std::endl;
+          variableCounter["event"]++;
+          variableCounter["request"]++;
+          std::cout << "--Crear evento"<<std::endl; 
         }
         | crear  CALENDARIO
         {
+          file << string($2) << std::endl;
+          file << " gapi.client.calendar.calendars.insert(resource"<< variableCounter["resource"] <<").then(function(response"<< variableCounter["response"] <<"){" << std::endl;
+          file << "   appendPre(\"Calendario\"+ \" 'response"<< variableCounter["response"] <<".summary' \" + \"creado\");" << std::endl;
+          file << " });" << std::endl;
+          file << std::endl;
+          variableCounter["resource"]++;
+          variableCounter["response"]++;
           std::cout << "--Crear calendario"<<std::endl;
         }
- FUNCIONES:   CREAR   FUNCIONES
+ PARAMETROSB: nombre DOSPUNTOS ALPHANUM PUNTOCOMA PARAMETROSB
+              {                                     
+                if(hasDescripcion)
+                {
+                  $$._descripcion = new char[string($5._descripcion).length()+1];
+                  $$._descripcion = $5._descripcion;
+                } 
+
+                if(hasInicio)
+                {
+                  $$._inicio.lexema = new char[string($5._inicio.lexema).length()+1];
+                  $$._inicio.lexema = $5._inicio.lexema;
+                  $$._inicio.type = $5._inicio.type;
+                } 
+
+                if(hasFin)
+                {
+                  $$._fin.lexema = new char[string($5._fin.lexema).length()+1];
+                  $$._fin.lexema = $5._fin.lexema;
+                  $$._fin.type = $5._fin.type;
+                } 
+
+                std::cout << "--Optional search nombre" << std::endl;
+                string _nombre = string($3);
+                $$._nombre = new char[_nombre.length()+1];
+                strcpy($$._nombre, _nombre.c_str());
+                hasNombre = true;
+                std::cout << "NOMBRE " << string($$._nombre) << std::endl;
+              }
+              | descripcion DOSPUNTOS ALPHANUM PUNTOCOMA PARAMETROSB
+              {     
+
+                string _descripcion = string($3);                     
+                $$._descripcion = new char[_descripcion.length()+1];
+                strcpy($$._descripcion, _descripcion.c_str());
+                std::cout << "DESC " << string($$._descripcion) << std::endl;
+                hasDescripcion = true;
+
+                if(hasNombre)
+                {
+                  $$._nombre = new char[string($5._nombre).length()+1];
+                  $$._nombre = $5._nombre;
+                } 
+
+                if(hasInicio)
+                {
+                  $$._inicio.lexema = new char[string($5._inicio.lexema).length()+1];
+                  $$._inicio.lexema = $5._inicio.lexema;
+                  $$._inicio.type = $5._inicio.type;
+                } 
+
+                if(hasFin)
+                {
+                  $$._fin.lexema = new char[string($5._fin.lexema).length()+1];
+                  $$._fin.lexema = $5._fin.lexema;
+                  $$._fin.type = $5._fin.type; 
+                }
+
+                std::cout << "--Optional search descripcion" << std::endl;
+              }
+              | inicio DOSPUNTOS COMILLASIMPLE TIEMPOINICIO COMILLASIMPLE PUNTOCOMA
+                fin DOSPUNTOS COMILLASIMPLE TIEMPOFIN COMILLASIMPLE PUNTOCOMA PARAMETROSB
+              {                              
+                if(isDateValid($4, $10))
+                {     
+                  string _inicio_string = string($4.lexema);                         
+                  string _fin_string = string($10.lexema); 
+
+                  $$._inicio.lexema = new char[_inicio_string.length()+1];                                  
+                  strcpy($$._inicio.lexema, _inicio_string.c_str());
+                  $$._inicio.type = $4.type;
+
+                  $$._fin.lexema = new char[_fin_string.length()+1];                                
+                  strcpy($$._fin.lexema, _fin_string.c_str());
+                  $$._fin.type = $10.type;
+
+                  hasInicio = true;
+                  hasFin = true;                     
+                  std::cout << "--InicioFin" << std::endl;
+
+                  if(hasNombre)
+                  {
+                    $$._nombre = new char[string($13._nombre).length()+1];
+                    $$._nombre = $13._nombre;
+                  } 
+
+                  if(hasDescripcion)
+                  {
+                    $$._descripcion = new char[string($13._descripcion).length()+1];
+                    $$._descripcion = $13._descripcion;
+                  }                 
+                  std::cout << "--Optional search Inicio y Fin" << std::endl;
+
+                  }                 
+                else
+                {
+                  std::cout << "ERROR => tiempo con límites incorrectos" << std::endl;                
+                  exit(-1);
+                }                                                
+              }
+              | /* empty */
+              {   
+                std::cout << "--Empty search params" << std::endl;
+              }
+ CONSULTAR: consultar evento LLAVEABRE CALENDARID PARAMETROSB LLAVECIERRA
+            {                             
+              std::cout << "BOOL NOMBRE: "<< hasNombre << std::endl;
+              std::cout << "BOOL DESC: "<< hasDescripcion << std::endl;
+              std::cout << "BOOL INICIO: "<< hasInicio << std::endl;
+              std::cout << "BOOL FIN: "<< hasFin << std::endl;
+              if(hasNombre)  
+                std::cout << "NOMBRE FUERA " << string($5._nombre) << std::endl;
+              if(hasDescripcion)  
+                std::cout << "DESC FUERA " << string($5._descripcion) << std::endl;
+              if(hasInicio)  
+                std::cout << "INICIO FUERA " << string($5._inicio.lexema) << std::endl;
+              if(hasFin)  
+                std::cout << "FIN FUERA " << string($5._fin.lexema) << std::endl;
+              std::cout << "--Consultar evento" << std::endl;
+            }      
+ FUNCIONES:   CONSULTAR FUNCIONES
+              {
+                std::cout << "--Consultar funciones" << std::endl;
+              }
+              | CREAR FUNCIONES
               {
                 std::cout << "--Crear funciones"<<std::endl;
               }
-              | CONSULTAR   FUNCIONES 
-              {
-                std::cout << "--Consultar funciones"<<std::endl;
-              }
-              | MODIFICAR   FUNCIONES
+              | MODIFICAR FUNCIONES
               {
                 std::cout << "--Modificar funciones"<<std::endl;
               }
-              | ELIMINAR   FUNCIONES
+              | ELIMINAR FUNCIONES
               {
                 std::cout << "--Eliminar funciones"<<std::endl;
-              }
-              | 
+              }              
+              | /* empty */
               {
                 std::cout << "--Funciones empty"<<std::endl;
               }
 %%
 //-- FUNCTION DEFINITIONS ---------------------------------
+
+void initMap(std::map<string, int> & map)
+{    
+  map["Enero"] = 1;
+  map["Febrero"] = 2;
+  map["Marzo"] = 3;
+  map["Abril"] = 4;
+  map["Mayo"] = 5;
+  map["Junio"] = 6;
+  map["Julio"] = 7;
+  map["Agosto"] = 8;
+  map["Septiembre"] = 9;
+  map["Octubre"] = 10;
+  map["Noviembre"] = 11;
+  map["Diciembre"] = 12;
+}
+
+int stringPos(string haystack, char needle, int nth)
+{// Will return position of n-th occurence of a char in a string.
+  string read;    // A string that will contain the read part of the haystack
+  for (int i=1 ; i<nth+1 ; ++i)
+  {
+    std::size_t found = haystack.find(needle);
+    read += haystack.substr(0,found+1); // the read part of the haystack is stocked in the read string
+    haystack.erase(0, found+1);     // remove the read part of the haystack up to the i-th needle
+    if (i == nth)
+    {
+      return read.size();
+    }
+  }
+  return -1;
+}
+
+bool isRealDate(DateTime date)
+{
+  //STUB
+  if(date.day <= 0 || date.day > 31)
+    return false;
+  if(date.month <= 0 || date.month > 12)
+    return false;
+  if(date.year <= 0)
+    return false;
+  return true;
+}
+
+std::ostream& operator << (std::ostream &o, const DateTime & date)
+{
+  o << "Day: " << date.day << std::endl;
+  o << "Month: " << date.month << std::endl;
+  o << "Year: " << date.year << std::endl;  
+  o << "Hours: " << date.hours << std::endl;
+  o << "Minutes: " << date.minutes << std::endl;
+  o << "Seconds: " << date.seconds << std::endl;  
+  o << "HasTime: " << date.hasTime << std::endl;
+  return o;
+}
+
+bool operator == (const DateTime & startDate, const DateTime & endDate)
+{
+  return startDate.day == endDate.day && startDate.month == endDate.month && startDate.year == endDate.year && startDate.hours == endDate.hours && startDate.minutes == endDate.minutes && startDate.seconds == endDate.seconds;
+}
+
+bool operator < (const DateTime & startDate, const DateTime & endDate)
+{ 
+  if(startDate == endDate)
+  {
+    return true;
+  }
+
+  if(startDate.year > endDate.year)
+  {  
+    return false;
+  }
+
+  if(startDate.month > endDate.month)
+  {
+    return false;
+  }
+
+  if(startDate.day > endDate.day)
+  { 
+    return false;
+  }
+
+  if(startDate.hours > endDate.hours)
+  {    
+    return false;
+  }
+
+  if (startDate.minutes > endDate.minutes)
+  {
+    return false;
+  }
+
+  if(startDate.seconds > endDate.seconds)
+  {
+    return false;
+  }
+  
+  return true;
+}
+
+bool isLogicalDate(DateTime startDate, DateTime endDate)
+{
+  // std::cout << "#############################" << std::endl;
+  // startDate < endDate ? std::cout << "menor" << std::endl : std::cout << "mayor" << std::endl;
+  return startDate < endDate;
+}
+
+DateTime getDateFromString(string date, int type)
+{    
+  struct DateTime res;
+  size_t found = date.find("/");
+  if(type == 1 || type == 2)
+  {
+    //fechanum
+    int FirstDash = stringPos(date, '/', 1);
+    int SecondDash = stringPos(date, '/', 2);
+    int day = stoi(date.substr(0,FirstDash));
+    int month = stoi(date.substr(FirstDash,SecondDash));
+    int year = stoi(date.substr(SecondDash));    
+    res.day = day;
+    res.month = month;
+    res.year = year;
+    res.hours = 0;
+    res.minutes = 0;
+    res.seconds = 0;
+    res.hasTime = false;    
+    if(type == 2)
+    {      
+      //fechanum hora            
+      int firstSpace = stringPos(date, ' ', 1);
+      int firstColon = stringPos(date, ':', 1);
+      int secondColon = stringPos(date, ':', 2);
+      int hours = stoi(date.substr(firstSpace, firstColon));
+      int minutes = stoi(date.substr(firstColon, secondColon));
+      int seconds = stoi(date.substr(secondColon));
+      res.hours = hours;
+      res.minutes = minutes;
+      res.seconds = seconds; 
+      res.hasTime = true;
+    }
+  }
+  else if(type == 3)
+  {
+    //fechastring  hora    
+    int firstSpace = stringPos(date, ' ', 1);
+    int secondSpace = stringPos(date, ' ', 2);    
+    int thirdSpace = stringPos(date, ' ', 3);    
+    int day = stoi(date.substr(0,firstSpace));     
+    int month = dateMap[date.substr(firstSpace, secondSpace-firstSpace-1)];
+    int year = stoi(date.substr(secondSpace, thirdSpace));    
+    res.day = day;
+    res.month = month;
+    res.year = year;    
+    int firstColon = stringPos(date, ':', 1);
+    int secondColon = stringPos(date, ':', 2);
+    int hours = stoi(date.substr(thirdSpace, firstColon));
+    int minutes = stoi(date.substr(firstColon, secondColon));
+    int seconds = stoi(date.substr(secondColon));
+    res.hours = hours;
+    res.minutes = minutes;
+    res.seconds = seconds; 
+    res.hasTime = true;
+  }
+  return res;
+}
+
+bool isDateValid(YYSTYPE::dateTime start_tok, YYSTYPE::dateTime end_tok)
+{  
+  string start = string(start_tok.lexema);  
+  string end = string(end_tok.lexema);     
+  size_t found = start.find("/");  
+  struct DateTime startDate = getDateFromString(start, start_tok.type);
+  struct DateTime endDate = getDateFromString(end, end_tok.type);  
+  if(isRealDate(startDate) && isRealDate(endDate))
+  {
+    if (isLogicalDate(startDate, endDate))
+    {
+      return true;
+    }
+    return false;
+  }
+  else
+  {
+    std::cout << "Fecha no válida" << std::endl;
+    return false;
+  }
+   
+   
+  return true;
+}
+
+void openFile(std::fstream & _file, std::string route)
+{
+  try
+  {
+    if (std::ofstream(route))
+    {            
+      _file.open(route, fstream::in | fstream::out);
+      if(_file.fail())
+      {
+        std::cout << "Error reading file... aborting" << std::endl;
+        throw 2;
+      }
+    }
+    else
+    {
+      std::cout << "File not found... Aborting" << std::endl;
+      throw 1;
+    }
+  }
+  catch (int e)
+  {
+    std::cerr << "Error reading data... Exception " << e << " caught" << std::endl;
+  }
+}
+
+void split(const std::string &s, char delim, std::vector<std::string> &elems) {
+    std::stringstream ss;
+    ss.str(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+}
+
+
+std::vector<std::string> split(std::string &s, char delim) {
+    std::vector<std::string> elems;
+    split(s, delim, elems);
+    return elems;
+}
+
+string getTime(DateTime date)
+{  
+  ostringstream _hours;
+  ostringstream _minutes;
+  ostringstream _seconds;
+  string resHours = "";
+  string resMinutes = "";
+  string resSeconds = "";
+  _hours << date.hours;
+  _minutes << date.minutes;
+  _seconds << date.seconds;
+
+  if(_hours.str().length() != 2)
+    resHours = "0"+_hours.str();
+  else
+    resHours = _hours.str();
+
+  if(_minutes.str().length() != 2)
+    resMinutes = "0"+_minutes.str();
+  else
+    resMinutes = _minutes.str();
+
+  if(_seconds.str().length() != 2)
+    resSeconds = "0"+_seconds.str();
+  else
+    resSeconds = _seconds.str();
+
+  return resHours + ":" + resMinutes + ":" + resSeconds;
+}
+
+void freeStr(char **str){
+    free( *str );
+    *str = NULL; 
+}
+
 int main( int argc, char **argv )
 {
     ++argv, --argc;     /* skip over program name */
@@ -181,7 +1100,18 @@ int main( int argc, char **argv )
        yyin = fopen( argv[0], "r" );
     else
        yyin = stdin;
- 
-  yyparse();
+  parameterCounter["lugar"] = false;
+  parameterCounter["archivo"] = false;
+  parameterCounter["invitados"] = false;
+  parameterCounter["zona"] = false;
+  variableCounter["event"] = 1;
+  variableCounter["request"] = 1;
+  variableCounter["resource"] = 1;
+  variableCounter["response"] = 1;
+  initMap(dateMap);
+  openFile(file, "output.html");  
+  yyparse();  
+  
+  file.close();
   return 0;
 }

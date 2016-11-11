@@ -67,90 +67,92 @@
       know about them.  */
    enum yytokentype {
      program = 258,
-     identifier = 259,
-     calendar_id = 260,
-     api_key = 261,
-     event_id = 262,
-     declare = 263,
-     calendario = 264,
-     user_id = 265,
-     permissions = 266,
-     crear = 267,
-     consultar = 268,
-     modificar = 269,
-     eliminar = 270,
-     evento = 271,
-     nombre = 272,
-     descripcion = 273,
-     inicio = 274,
-     fin = 275,
-     zona = 276,
-     recordatorio = 277,
-     invitados = 278,
-     lugar = 279,
-     archivo = 280,
-     READ = 281,
-     WRITE = 282,
-     ZONA = 283,
-     HORA = 284,
-     FECHA = 285,
-     FLOAT = 286,
-     MAIL = 287,
-     LLAVEABRE = 288,
-     LLAVECIERRA = 289,
-     IGUAL = 290,
-     DOSPUNTOS = 291,
-     PUNTOCOMA = 292,
-     COMA = 293,
-     COMILLASIMPLE = 294,
-     ID = 295,
-     ALPHANUM = 296,
-     AND = 297,
-     URL = 298
+     calendar_id = 259,
+     api_key = 260,
+     event_id = 261,
+     declare = 262,
+     calendario = 263,
+     user_id = 264,
+     permissions = 265,
+     crear = 266,
+     consultar = 267,
+     modificar = 268,
+     eliminar = 269,
+     evento = 270,
+     nombre = 271,
+     descripcion = 272,
+     inicio = 273,
+     fin = 274,
+     zona = 275,
+     recordatorio = 276,
+     invitados = 277,
+     lugar = 278,
+     archivo = 279,
+     LLAVEABRE = 280,
+     LLAVECIERRA = 281,
+     IGUAL = 282,
+     DOSPUNTOS = 283,
+     PUNTOCOMA = 284,
+     COMA = 285,
+     COMILLASIMPLE = 286,
+     ID = 287,
+     AND = 288,
+     FECHANUM = 289,
+     FECHASTRING = 290,
+     HORA = 291,
+     ALPHANUM = 292,
+     READ = 293,
+     WRITE = 294,
+     ZONA = 295,
+     MAIL = 296,
+     URL = 297,
+     ALPHANUMEVENTID = 298,
+     FLOAT = 299
    };
 #endif
 /* Tokens.  */
 #define program 258
-#define identifier 259
-#define calendar_id 260
-#define api_key 261
-#define event_id 262
-#define declare 263
-#define calendario 264
-#define user_id 265
-#define permissions 266
-#define crear 267
-#define consultar 268
-#define modificar 269
-#define eliminar 270
-#define evento 271
-#define nombre 272
-#define descripcion 273
-#define inicio 274
-#define fin 275
-#define zona 276
-#define recordatorio 277
-#define invitados 278
-#define lugar 279
-#define archivo 280
-#define READ 281
-#define WRITE 282
-#define ZONA 283
-#define HORA 284
-#define FECHA 285
-#define FLOAT 286
-#define MAIL 287
-#define LLAVEABRE 288
-#define LLAVECIERRA 289
-#define IGUAL 290
-#define DOSPUNTOS 291
-#define PUNTOCOMA 292
-#define COMA 293
-#define COMILLASIMPLE 294
-#define ID 295
-#define ALPHANUM 296
-#define AND 297
-#define URL 298
+#define calendar_id 259
+#define api_key 260
+#define event_id 261
+#define declare 262
+#define calendario 263
+#define user_id 264
+#define permissions 265
+#define crear 266
+#define consultar 267
+#define modificar 268
+#define eliminar 269
+#define evento 270
+#define nombre 271
+#define descripcion 272
+#define inicio 273
+#define fin 274
+#define zona 275
+#define recordatorio 276
+#define invitados 277
+#define lugar 278
+#define archivo 279
+#define LLAVEABRE 280
+#define LLAVECIERRA 281
+#define IGUAL 282
+#define DOSPUNTOS 283
+#define PUNTOCOMA 284
+#define COMA 285
+#define COMILLASIMPLE 286
+#define ID 287
+#define AND 288
+#define FECHANUM 289
+#define FECHASTRING 290
+#define HORA 291
+#define ALPHANUM 292
+#define READ 293
+#define WRITE 294
+#define ZONA 295
+#define MAIL 296
+#define URL 297
+#define ALPHANUMEVENTID 298
+#define FLOAT 299
 
 
 
@@ -162,11 +164,32 @@
 #include <stdio.h>
 #include <string>
 #include <cstdlib>
+#include <map>
+#include <fstream>
+#include <vector>
+#include <sstream>
 using namespace std;
 
 extern FILE *yyin;
 int yylex(); 
 int yyerror(const char *p) { cerr << "Error with source!" << endl; return 0; }
+
+struct DateTime{
+  int day;
+  int month;
+  int year;
+  int hours;
+  int minutes;
+  int seconds;
+  bool hasTime;
+};
+
+map<string,int> dateMap;
+map<string, bool> parameterCounter;
+map<string, int> variableCounter;
+std::fstream file;
+bool hasNombre, hasDescripcion, hasInicio, hasFin = false;
+//{lugar, archivo, invitados, zona}
 
 
 /* Enabling traces.  */
@@ -189,12 +212,53 @@ int yyerror(const char *p) { cerr << "Error with source!" << endl; return 0; }
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 14 "calendar.ypp"
+#line 35 "calendar.ypp"
 {
   int val;
+  char* lexema;
+  float valF;
+  struct dateTime{
+    char* lexema;
+    int type;
+  } time; 
+
+  struct ParametrosB{
+    char* _nombre;    
+    char* _descripcion;
+    dateTime _inicio;
+    dateTime _fin;
+  }paramsB;
+
+  struct ParametrosN{
+    char* _nombre;
+    char* _descripcion;
+    dateTime _inicio;
+    dateTime _fin;
+    float _recordatorio;
+    char* _event_id;
+  } paramsN;
+
+  struct ParametrosO{
+    char* _lugar;
+    char* _archivo;
+    char* _invitados;
+    char* _zona;    
+  } paramsO;
+
+  struct ParametrosCalendario{
+    char* _nombre;
+    char* _descripcion;
+  }paramsC;
+
+  struct Event{
+    char* lexema;
+    char* _calendar_id;
+    char* _event_id;
+  } event;  
+
 }
 /* Line 193 of yacc.c.  */
-#line 198 "calendar.tab.cpp"
+#line 262 "calendar.tab.cpp"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -204,10 +268,23 @@ typedef union YYSTYPE
 
 
 /* Copy the second part of user declarations.  */
+#line 91 "calendar.ypp"
+
+  DateTime getDateFromString(string date, int type);
+  bool isDateValid(YYSTYPE::dateTime start, YYSTYPE::dateTime end);
+  int strpos(string haystack, char needle, int nth);
+  bool isRealDate(int day, int month, int year);
+  void initMap(std::map<string, int> & map);
+  bool isLogicalDate(DateTime startDate, DateTime endDate);
+  void openFile(std::fstream & _file, std::string route); 
+  void split(const std::string &s, char delim, std::vector<std::string> &elems); 
+  std::vector<std::string> split(std::string &s, char delim);
+  string getTime(DateTime date);
+  void freeStr(char **str);
 
 
 /* Line 216 of yacc.c.  */
-#line 211 "calendar.tab.cpp"
+#line 288 "calendar.tab.cpp"
 
 #ifdef short
 # undef short
@@ -422,20 +499,20 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  4
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   147
+#define YYLAST   151
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  44
+#define YYNTOKENS  45
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  21
+#define YYNNTS  20
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  38
+#define YYNRULES  40
 /* YYNRULES -- Number of states.  */
-#define YYNSTATES  158
+#define YYNSTATES  166
 
 /* YYTRANSLATE(YYLEX) -- Bison symbol number corresponding to YYLEX.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   298
+#define YYMAXUTOK   299
 
 #define YYTRANSLATE(YYX)						\
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -472,7 +549,7 @@ static const yytype_uint8 yytranslate[] =
        5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
       15,    16,    17,    18,    19,    20,    21,    22,    23,    24,
       25,    26,    27,    28,    29,    30,    31,    32,    33,    34,
-      35,    36,    37,    38,    39,    40,    41,    42,    43
+      35,    36,    37,    38,    39,    40,    41,    42,    43,    44
 };
 
 #if YYDEBUG
@@ -481,44 +558,47 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyprhs[] =
 {
        0,     0,     3,    10,    12,    16,    34,    39,    40,    45,
-      47,    50,    56,    60,    67,    73,    78,    91,    97,   103,
-     106,   107,   132,   138,   144,   150,   158,   159,   168,   173,
-     176,   179,   186,   189,   192,   195,   198,   201,   204
+      47,    50,    53,    55,    58,    61,    67,    71,    78,    83,
+     112,   118,   124,   130,   138,   139,   148,   153,   156,   163,
+     166,   169,   175,   181,   195,   196,   203,   206,   209,   212,
+     215
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
 static const yytype_int8 yyrhs[] =
 {
-      45,     0,    -1,     3,    41,    33,    47,    64,    34,    -1,
-      26,    -1,    26,    42,    27,    -1,     8,    10,    35,    41,
-      37,     8,     6,    35,    41,    37,     8,    11,    35,    39,
-      46,    39,    37,    -1,     4,    36,    41,    37,    -1,    -1,
-       4,    36,    41,    37,    -1,    30,    -1,    30,    29,    -1,
-      39,    32,    39,    38,    51,    -1,    39,    32,    39,    -1,
-      16,    33,    48,    57,    58,    34,    -1,    16,    33,    48,
-      56,    34,    -1,     9,    33,    59,    34,    -1,    19,    36,
-      39,    50,    39,    37,    20,    36,    39,    50,    39,    37,
-      -1,    17,    36,    41,    37,    56,    -1,    18,    36,    41,
-      37,    56,    -1,    55,    56,    -1,    -1,    17,    36,    41,
-      37,    18,    36,    41,    37,    19,    36,    39,    50,    39,
-      37,    20,    36,    39,    50,    39,    37,    22,    36,    31,
-      37,    -1,    24,    36,    41,    37,    58,    -1,    25,    36,
-      43,    37,    58,    -1,    23,    36,    51,    37,    58,    -1,
-      21,    36,    39,    28,    39,    37,    58,    -1,    -1,    17,
-      36,    41,    37,    18,    36,    41,    37,    -1,    17,    36,
-      41,    37,    -1,    13,    53,    -1,    14,    52,    -1,    15,
-      16,    33,    48,    49,    34,    -1,    12,    52,    -1,    12,
-      54,    -1,    63,    64,    -1,    60,    64,    -1,    61,    64,
-      -1,    62,    64,    -1,    -1
+      46,     0,    -1,     3,    37,    25,    48,    64,    26,    -1,
+      38,    -1,    38,    33,    39,    -1,     7,     9,    27,    37,
+      29,     7,     5,    27,    37,    29,     7,    10,    27,    31,
+      47,    31,    29,    -1,     4,    28,    37,    29,    -1,    -1,
+       6,    28,    43,    29,    -1,    34,    -1,    34,    36,    -1,
+      35,    36,    -1,    34,    -1,    34,    36,    -1,    35,    36,
+      -1,    31,    41,    31,    30,    53,    -1,    31,    41,    31,
+      -1,    15,    25,    49,    56,    57,    26,    -1,     8,    25,
+      58,    26,    -1,     6,    28,    43,    29,    16,    28,    37,
+      29,    17,    28,    37,    29,    18,    28,    31,    51,    31,
+      29,    19,    28,    31,    52,    31,    29,    21,    28,    44,
+      29,    -1,    23,    28,    37,    29,    57,    -1,    24,    28,
+      42,    29,    57,    -1,    22,    28,    53,    29,    57,    -1,
+      20,    28,    31,    40,    31,    29,    57,    -1,    -1,    16,
+      28,    37,    29,    17,    28,    37,    29,    -1,    16,    28,
+      37,    29,    -1,    13,    54,    -1,    14,    15,    25,    49,
+      50,    26,    -1,    11,    54,    -1,    11,    55,    -1,    16,
+      28,    37,    29,    62,    -1,    17,    28,    37,    29,    62,
+      -1,    18,    28,    31,    51,    31,    29,    19,    28,    31,
+      52,    31,    29,    62,    -1,    -1,    12,    15,    25,    49,
+      62,    26,    -1,    63,    64,    -1,    61,    64,    -1,    59,
+      64,    -1,    60,    64,    -1,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_uint16 yyrline[] =
 {
-       0,    21,    21,    25,    29,    33,    39,    43,    46,    50,
-      54,    58,    62,    66,    70,    74,    78,    83,    87,    91,
-      96,    99,   107,   111,   115,   119,   124,   127,   131,   135,
-     139,   143,   147,   151,   155,   159,   163,   167,   172
+       0,   106,   106,   141,   148,   155,   203,   211,   217,   224,
+     232,   242,   252,   260,   270,   280,   288,   295,   399,   417,
+     467,   504,   539,   575,   610,   613,   624,   631,   651,   666,
+     684,   696,   725,   756,   797,   800,   816,   820,   824,   828,
+     833
 };
 #endif
 
@@ -527,17 +607,18 @@ static const yytype_uint8 yyrline[] =
    First, the terminals, then, starting at YYNTOKENS, nonterminals.  */
 static const char *const yytname[] =
 {
-  "$end", "error", "$undefined", "program", "identifier", "calendar_id",
-  "api_key", "event_id", "declare", "calendario", "user_id", "permissions",
-  "crear", "consultar", "modificar", "eliminar", "evento", "nombre",
-  "descripcion", "inicio", "fin", "zona", "recordatorio", "invitados",
-  "lugar", "archivo", "READ", "WRITE", "ZONA", "HORA", "FECHA", "FLOAT",
-  "MAIL", "LLAVEABRE", "LLAVECIERRA", "IGUAL", "DOSPUNTOS", "PUNTOCOMA",
-  "COMA", "COMILLASIMPLE", "ID", "ALPHANUM", "AND", "URL", "$accept",
-  "PROGRAM", "PERMISSION", "SETUP", "CALENDARID", "EVENTID", "TIEMPO",
-  "REGLAMAIL", "EVENTO", "EVENTOBUSQUEDA", "CALENDARIO", "INICIOFIN",
-  "PARAMETROSB", "PARAMETROSN", "PARAMETROSO", "PARAMETROSCALENDARIO",
-  "CONSULTAR", "MODIFICAR", "ELIMINAR", "CREAR", "FUNCIONES", 0
+  "$end", "error", "$undefined", "program", "calendar_id", "api_key",
+  "event_id", "declare", "calendario", "user_id", "permissions", "crear",
+  "consultar", "modificar", "eliminar", "evento", "nombre", "descripcion",
+  "inicio", "fin", "zona", "recordatorio", "invitados", "lugar", "archivo",
+  "LLAVEABRE", "LLAVECIERRA", "IGUAL", "DOSPUNTOS", "PUNTOCOMA", "COMA",
+  "COMILLASIMPLE", "ID", "AND", "FECHANUM", "FECHASTRING", "HORA",
+  "ALPHANUM", "READ", "WRITE", "ZONA", "MAIL", "URL", "ALPHANUMEVENTID",
+  "FLOAT", "$accept", "PROGRAM", "PERMISSION", "SETUP", "CALENDARID",
+  "EVENTID", "TIEMPOINICIO", "TIEMPOFIN", "REGLAMAIL", "EVENTO",
+  "CALENDARIO", "PARAMETROSN", "PARAMETROSO", "PARAMETROSCALENDARIO",
+  "MODIFICAR", "ELIMINAR", "CREAR", "PARAMETROSB", "CONSULTAR",
+  "FUNCIONES", 0
 };
 #endif
 
@@ -550,26 +631,28 @@ static const yytype_uint16 yytoknum[] =
      265,   266,   267,   268,   269,   270,   271,   272,   273,   274,
      275,   276,   277,   278,   279,   280,   281,   282,   283,   284,
      285,   286,   287,   288,   289,   290,   291,   292,   293,   294,
-     295,   296,   297,   298
+     295,   296,   297,   298,   299
 };
 # endif
 
 /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    44,    45,    46,    46,    47,    48,    48,    49,    50,
-      50,    51,    51,    52,    53,    54,    55,    56,    56,    56,
-      56,    57,    58,    58,    58,    58,    58,    59,    59,    60,
-      61,    62,    63,    63,    64,    64,    64,    64,    64
+       0,    45,    46,    47,    47,    48,    49,    49,    50,    51,
+      51,    51,    52,    52,    52,    53,    53,    54,    55,    56,
+      57,    57,    57,    57,    57,    58,    58,    59,    60,    61,
+      61,    62,    62,    62,    62,    63,    64,    64,    64,    64,
+      64
 };
 
 /* YYR2[YYN] -- Number of symbols composing right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     6,     1,     3,    17,     4,     0,     4,     1,
-       2,     5,     3,     6,     5,     4,    12,     5,     5,     2,
-       0,    24,     5,     5,     5,     7,     0,     8,     4,     2,
-       2,     6,     2,     2,     2,     2,     2,     2,     0
+       2,     2,     1,     2,     2,     5,     3,     6,     4,    28,
+       5,     5,     5,     7,     0,     8,     4,     2,     6,     2,
+       2,     5,     5,    13,     0,     6,     2,     2,     2,     2,
+       0
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -577,61 +660,61 @@ static const yytype_uint8 yyr2[] =
    means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     0,     0,     0,     1,     0,     0,    38,     0,     0,
-       0,     0,     0,    38,    38,    38,    38,     0,     0,     0,
-       0,    32,    33,     0,    29,    30,     0,    35,    36,    37,
-      34,     2,     0,     0,     7,     7,     0,     0,     0,     0,
-       0,     0,    20,     0,     0,     0,    15,     0,     0,    26,
-       0,     0,     0,    20,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,     0,     0,    19,
-      14,     0,    31,     0,    28,     6,     0,     0,     0,     0,
-       0,    13,     0,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,     0,    20,    20,     9,     0,     8,     0,
-       0,     0,     0,     0,    26,    26,    26,    17,    18,    10,
-       0,     0,     0,     0,     0,    12,    24,    22,    23,     0,
-       0,    27,     0,    26,     0,     0,     0,     0,    25,    11,
-       0,     0,     0,     0,     3,     0,     0,     0,     0,     0,
-       0,     0,     4,     5,     0,    16,     0,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     0,    21
+       0,     0,     0,     0,     1,     0,     0,    40,     0,     0,
+       0,     0,     0,    40,    40,    40,    40,     0,     0,     0,
+       0,    29,    30,     0,    27,     0,    38,    39,    37,    36,
+       2,     0,     0,     7,     7,     7,     0,     0,     0,     0,
+       0,    34,     0,     0,     0,    18,     0,     0,    24,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,    35,     0,    28,
+       0,    26,     6,     0,     0,     0,     0,     0,    17,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,    34,    34,     9,     0,     0,     8,     0,     0,     0,
+       0,     0,    24,    24,    24,    31,    32,    10,    11,     0,
+       0,     0,     0,     0,    16,    22,    20,    21,     0,     0,
+      25,     0,    24,     0,     0,     0,     0,    23,    15,     0,
+       0,     0,     0,     3,     0,     0,    12,     0,     0,     0,
+       0,     0,    13,    14,     0,     4,     5,     0,    34,     0,
+      33,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,    19
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int16 yydefgoto[] =
 {
-      -1,     2,   135,     7,    41,    56,    97,    91,    21,    24,
-      22,    53,    54,    49,    65,    39,    13,    14,    15,    16,
-      17
+      -1,     2,   134,     7,    40,    54,    95,   138,    88,    21,
+      22,    48,    63,    38,    13,    14,    15,    52,    16,    17
 };
 
 /* YYPACT[STATE-NUM] -- Index in YYTABLE of the portion describing
    STATE-NUM.  */
-#define YYPACT_NINF -130
-static const yytype_int16 yypact[] =
+#define YYPACT_NINF -101
+static const yytype_int8 yypact[] =
 {
-       4,   -13,    29,    -3,  -130,    23,    22,     1,    -2,    -4,
-      18,    19,    20,     1,     1,     1,     1,     3,    -1,     5,
-       6,  -130,  -130,    10,  -130,  -130,    11,  -130,  -130,  -130,
-    -130,  -130,     8,    30,    42,    42,    42,    40,    13,    16,
-      15,    35,     0,    49,    48,    14,  -130,    17,    21,   -15,
-      24,    25,    26,     0,    31,    27,    32,    33,    34,    36,
-      28,    38,    39,    41,    43,    44,    45,    46,    37,  -130,
-    -130,    47,  -130,    50,    52,  -130,    53,    54,    55,    51,
-      56,  -130,    58,    59,    67,    61,    63,    65,    62,    57,
-      70,    66,    68,    69,     0,     0,    60,    71,  -130,    64,
-      72,    73,    75,    76,   -15,   -15,   -15,  -130,  -130,  -130,
-      74,    93,    79,    77,    80,    81,  -130,  -130,  -130,    87,
-      85,  -130,    84,   -15,    55,    86,    88,    89,  -130,  -130,
-      90,    97,    92,    67,    82,    91,    94,    95,    98,    99,
-      67,   100,  -130,  -130,    96,  -130,   101,   106,   103,   102,
-      67,   104,   105,   109,   108,   114,   110,  -130
+       8,   -30,    21,     9,  -101,    25,    24,     2,    10,    -3,
+      20,    23,    26,     2,     2,     2,     2,    13,    -1,    15,
+      17,  -101,  -101,    18,  -101,    19,  -101,  -101,  -101,  -101,
+    -101,    16,    30,    43,    43,    43,    41,    22,    27,    28,
+      45,     7,    46,    44,    29,  -101,    31,    32,   -14,    33,
+      34,    35,    38,    37,    47,    40,    42,    48,    11,    50,
+      51,    52,    53,    49,    39,    54,    55,  -101,    12,  -101,
+      56,    57,  -101,    58,    59,    61,    60,    62,  -101,    65,
+      66,    -8,    67,    69,    71,    68,    63,    64,    72,    73,
+      77,     7,     7,    36,    74,    76,  -101,    75,    78,    80,
+      81,    82,   -14,   -14,   -14,  -101,  -101,  -101,  -101,    85,
+      79,    87,    83,    88,    70,  -101,  -101,  -101,    90,    84,
+    -101,    89,   -14,    61,    91,    92,   104,  -101,  -101,    93,
+      94,    97,    -6,    95,    96,    98,    86,   100,    99,   101,
+     102,   105,  -101,  -101,   108,  -101,  -101,   111,     7,   110,
+    -101,   112,    -8,   113,   116,   107,   114,   115,    -6,   117,
+     118,   120,   121,    14,   122,  -101
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int16 yypgoto[] =
 {
-    -130,  -130,  -130,  -130,    -9,  -130,  -129,   -68,   121,  -130,
-    -130,  -130,   -53,  -130,  -103,  -130,  -130,  -130,  -130,  -130,
-       9
+    -101,  -101,  -101,  -101,    -4,  -101,   -93,   -89,   -53,   128,
+    -101,  -101,  -100,  -101,  -101,  -101,  -101,   -91,  -101,     4
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]].  What to do in state STATE-NUM.  If
@@ -641,62 +724,65 @@ static const yytype_int16 yypgoto[] =
 #define YYTABLE_NINF -1
 static const yytype_uint8 yytable[] =
 {
-      69,   116,   117,   118,   137,    19,    61,     1,    62,    63,
-      64,   144,    20,     9,    10,    11,    12,    50,    51,    52,
-     128,   151,    27,    28,    29,    30,    42,    43,     3,     4,
-       5,     6,     8,    18,    23,    20,    26,    31,    33,    34,
-      32,   107,   108,    35,    36,    37,    40,    38,    44,    45,
-      46,    47,    48,    55,    57,    58,   129,    60,    59,     0,
-      66,    67,    68,    71,     0,    70,    72,     0,    73,    76,
-      87,    74,   111,    75,    77,    78,    84,    79,    81,    80,
-     101,     0,     0,     0,     0,   102,    82,    83,    85,   109,
-      88,    86,    92,    89,    90,    94,    95,    96,    98,    93,
-      99,   100,   103,   104,   120,   105,   106,   125,   132,   113,
-     110,   119,     0,   112,   114,   115,   121,   123,   122,   124,
-     126,   127,   130,   134,   138,   142,   148,   131,   136,   133,
-     139,   154,    25,   140,   141,   146,   143,   145,   147,   149,
-       0,   150,   153,   152,   155,   156,     0,   157
+     105,   106,   115,   116,   117,    19,    59,     3,    60,    61,
+      62,     1,    20,     9,    10,    11,    12,    26,    27,    28,
+      29,     4,   127,    49,    50,    51,    93,    94,   136,   137,
+      41,    42,     6,     8,     5,    23,    31,    18,    20,    30,
+      32,    25,    33,    34,    35,    36,    37,    39,    43,    55,
+      44,    47,    53,    45,    73,    82,    46,   150,   164,   153,
+      58,    64,    65,    66,    67,    68,    56,    70,    57,   159,
+     128,    71,   107,    69,    84,    78,    79,    72,    74,    75,
+      76,    77,   110,     0,    99,     0,    81,    85,     0,   119,
+      86,    80,    87,    83,    91,    92,    96,    89,    97,    98,
+     123,   102,   103,   100,    90,   101,   104,   109,   112,   124,
+     108,   125,   113,   114,   118,   111,   120,   122,   126,   129,
+     121,   131,   142,   130,   132,   135,   156,   140,   139,   149,
+     144,   146,   133,     0,   147,   141,   143,   148,   151,    24,
+     145,   162,   157,   152,   154,   155,   158,   161,   160,   163,
+       0,   165
 };
 
 static const yytype_int16 yycheck[] =
 {
-      53,   104,   105,   106,   133,     9,    21,     3,    23,    24,
-      25,   140,    16,    12,    13,    14,    15,    17,    18,    19,
-     123,   150,    13,    14,    15,    16,    35,    36,    41,     0,
-      33,     8,    10,    35,    16,    16,    16,    34,    33,    33,
-      41,    94,    95,    33,    33,    37,     4,    17,     8,    36,
-      34,    36,    17,     4,     6,    41,   124,    36,    41,    -1,
-      36,    36,    36,    36,    -1,    34,    34,    -1,    35,    41,
-      18,    37,     8,    37,    36,    36,    39,    36,    34,    36,
-      18,    -1,    -1,    -1,    -1,    28,    41,    41,    41,    29,
-      37,    41,    41,    39,    39,    37,    37,    30,    37,    43,
-      37,    36,    32,    37,    11,    37,    37,    20,    19,    36,
-      39,    37,    -1,    41,    39,    39,    37,    37,    41,    38,
-      35,    37,    36,    26,    42,    27,    20,    39,    36,    39,
-      39,    22,    11,    39,    39,    39,    37,    37,    37,    36,
-      -1,    39,    37,    39,    36,    31,    -1,    37
+      91,    92,   102,   103,   104,     8,    20,    37,    22,    23,
+      24,     3,    15,    11,    12,    13,    14,    13,    14,    15,
+      16,     0,   122,    16,    17,    18,    34,    35,    34,    35,
+      34,    35,     7,     9,    25,    15,    37,    27,    15,    26,
+      25,    15,    25,    25,    25,    29,    16,     4,     7,     5,
+      28,     6,     6,    26,    43,    43,    28,   148,    44,   152,
+      28,    28,    28,    28,    26,    28,    37,    27,    37,   158,
+     123,    29,    36,    26,    17,    26,    37,    29,    28,    28,
+      28,    28,     7,    -1,    16,    -1,    31,    29,    -1,    10,
+      31,    37,    31,    37,    29,    29,    29,    37,    29,    28,
+      30,    29,    29,    40,    42,    41,    29,    31,    28,    19,
+      36,    27,    31,    31,    29,    37,    29,    29,    29,    28,
+      37,    17,    36,    31,    31,    28,    19,    31,    33,    18,
+      31,    29,    38,    -1,    29,    37,    36,    29,    28,    11,
+      39,    21,    28,    31,    31,    29,    31,    29,    31,    28,
+      -1,    29
 };
 
 /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
    symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     3,    45,    41,     0,    33,     8,    47,    10,    12,
-      13,    14,    15,    60,    61,    62,    63,    64,    35,     9,
-      16,    52,    54,    16,    53,    52,    16,    64,    64,    64,
-      64,    34,    41,    33,    33,    33,    33,    37,    17,    59,
-       4,    48,    48,    48,     8,    36,    34,    36,    17,    57,
-      17,    18,    19,    55,    56,     4,    49,     6,    41,    41,
-      36,    21,    23,    24,    25,    58,    36,    36,    36,    56,
-      34,    36,    34,    35,    37,    37,    41,    36,    36,    36,
-      36,    34,    41,    41,    39,    41,    41,    18,    37,    39,
-      39,    51,    41,    43,    37,    37,    30,    50,    37,    37,
-      36,    18,    28,    32,    37,    37,    37,    56,    56,    29,
-      39,     8,    41,    36,    39,    39,    58,    58,    58,    37,
-      11,    37,    41,    37,    38,    20,    35,    37,    58,    51,
-      36,    39,    19,    39,    26,    46,    36,    50,    42,    39,
-      39,    39,    27,    37,    50,    37,    39,    37,    20,    36,
-      39,    50,    39,    37,    22,    36,    31,    37
+       0,     3,    46,    37,     0,    25,     7,    48,     9,    11,
+      12,    13,    14,    59,    60,    61,    63,    64,    27,     8,
+      15,    54,    55,    15,    54,    15,    64,    64,    64,    64,
+      26,    37,    25,    25,    25,    25,    29,    16,    58,     4,
+      49,    49,    49,     7,    28,    26,    28,     6,    56,    16,
+      17,    18,    62,     6,    50,     5,    37,    37,    28,    20,
+      22,    23,    24,    57,    28,    28,    28,    26,    28,    26,
+      27,    29,    29,    43,    28,    28,    28,    28,    26,    37,
+      37,    31,    43,    37,    17,    29,    31,    31,    53,    37,
+      42,    29,    29,    34,    35,    51,    29,    29,    28,    16,
+      40,    41,    29,    29,    29,    62,    62,    36,    36,    31,
+       7,    37,    28,    31,    31,    57,    57,    57,    29,    10,
+      29,    37,    29,    30,    19,    27,    29,    57,    53,    28,
+      31,    17,    31,    38,    47,    28,    34,    35,    52,    33,
+      31,    37,    36,    36,    31,    39,    29,    29,    29,    18,
+      62,    28,    31,    51,    31,    29,    19,    28,    31,    52,
+      31,    29,    21,    28,    44,    29
 };
 
 #define yyerrok		(yyerrstatus = 0)
@@ -1511,259 +1597,836 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 22 "calendar.ypp"
-    {
+#line 107 "calendar.ypp"
+    {        
+    file << "}" << std::endl;
+
+    file << "function handleAuthClick(event) {" << std::endl;
+    file << "      gapi.auth.authorize({" << std::endl;
+    file << "          client_id: CLIENT_ID," << std::endl;
+    file << "          scope: SCOPES," << std::endl;
+    file << "          immediate: false" << std::endl;
+    file << "        }," << std::endl;
+    file << "        handleAuthResult);" << std::endl;
+    file << "      return false;" << std::endl;
+    file << "    }" << std::endl;
+    file << "function appendPre(message) {" << std::endl;
+    file << "      var pre = document.getElementById('output');" << std::endl;
+    file << "      var textContent = document.createTextNode(message + '\\n');" << std::endl;
+    file << "      pre.appendChild(textContent);" << std::endl;
+    file << "    }" << std::endl;
+
+    file << "  </script>" << std::endl;
+    file << "  <script src=\"https://apis.google.com/js/client.js?onload=handleLoad\">" << std::endl;
+    file << "  </script>" << std::endl;
+    file << "</head>" << std::endl;    
+    file << "<body>" << std::endl;
+    file << "  <div id=\"authorize-div\" style=\"display: none\">" << std::endl;
+    file << "    <span>Authorize access to Google Calendar API</span>" << std::endl;
+    file << "    <button id=\"authorize-button\" onclick=\"handleAuthClick(event)\">" << std::endl;
+    file << "      Authorize" << std::endl;
+    file << "    </button>" << std::endl;
+    file << "  </div>" << std::endl;
+    file << "  <pre id=\"output\"></pre>" << std::endl;
+    file << "</body>" << std::endl;
+    file << "</html>" << std::endl;
     std::cout << "--program->program ALPHANUM {setup funciones}"<<std::endl;
   ;}
     break;
 
   case 3:
-#line 26 "calendar.ypp"
-    {
+#line 142 "calendar.ypp"
+    {      
+                string res = "R";  
+                (yyval.lexema) = new char[res.length()+1];
+                strcpy((yyval.lexema), res.c_str());
                 std::cout << "--Read permissions"<<std::endl;
               ;}
     break;
 
   case 4:
-#line 30 "calendar.ypp"
-    {
+#line 149 "calendar.ypp"
+    {  
+                string res = "R W";
+                (yyval.lexema) = new char[res.length()+1];
+                strcpy((yyval.lexema), res.c_str());
                 std::cout << "--Read, write permissions"<<std::endl;
               ;}
     break;
 
   case 5:
-#line 36 "calendar.ypp"
+#line 158 "calendar.ypp"
     {
+              string _user_id = string((yyvsp[(4) - (17)].lexema));
+              string _api_key = string((yyvsp[(9) - (17)].lexema));              
+              string _permission;
+              if(string((yyvsp[(15) - (17)].lexema)) == "R")
+                _permission = "\"https://www.googleapis.com/auth/calendar.readonly\"";
+              else
+                _permission = "\"https://www.googleapis.com/auth/calendar.readonly\", \"https://www.googleapis.com/auth/calendar\"";
+
+              file << "<html>" << std::endl;
+              file << " <head>" << std::endl;
+              file << "   <script type=\"text/javascript\">" << std::endl;              
+              file << "   var CLIENT_ID = "+_user_id+";" << std::endl;
+              file << "   var API_KEY = "+_api_key+";" << std::endl;
+              file << "   var SCOPES = ["+_permission+"];" << std::endl; 
+              file << "function handleLoad() {" << std::endl;
+              file << "      gapi.client.setApiKey(API_KEY);" << std::endl;
+              file << "      checkAuth();" << std::endl;
+              file << "    }" << std::endl;
+              file << "function checkAuth() {" << std::endl;
+              file << "      gapi.auth.authorize({" << std::endl;
+              file << "        'client_id': CLIENT_ID," << std::endl;
+              file << "        'scope': SCOPES.join(' ')," << std::endl;
+              file << "        'immediate': true" << std::endl;
+              file << "      }, handleAuthResult);" << std::endl;
+              file << "    }" << std::endl;
+              file << "function handleAuthResult(authResult) {" << std::endl;
+              file << "      var authorizeDiv = document.getElementById('authorize-div');" << std::endl;
+              file << "      if (authResult && !authResult.error) {" << std::endl;
+              file << "        authorizeDiv.style.display = 'none';" << std::endl;
+              file << "        gapi.client.load('calendar', 'v3').then(function() {" << std::endl;
+              file << "          callFunctions();" << std::endl;
+              file << "        });" << std::endl;
+              file << "      } else {" << std::endl;
+              file << "        authorizeDiv.style.display = 'inline';" << std::endl;
+              file << "      }" << std::endl;
+              file << "    }" << std::endl;    
+              file << "function callFunctions() {" << std::endl;
+              file << std::endl;
+              std::cout << "@@@@@@@@@@@" << std::endl;              
               std::cout << "--Declare Setup"<<std::endl;
+              
+              
+              
             ;}
     break;
 
   case 6:
-#line 40 "calendar.ypp"
+#line 204 "calendar.ypp"
     {
+                string res = string((yyvsp[(3) - (4)].lexema));
+                (yyval.lexema) = new char[res.length()+1];
+                strcpy((yyval.lexema), res.c_str());                
                 std::cout << "--CalendarId"<<std::endl;
               ;}
     break;
 
   case 7:
-#line 43 "calendar.ypp"
+#line 211 "calendar.ypp"
     {
-                  std::cout << "--Empty CalendarId"<<std::endl;
-                ;}
+                string res = "'primary'";
+                (yyval.lexema) = new char[res.length()+1];
+                strcpy((yyval.lexema), res.c_str()); 
+                std::cout << "--Empty CalendarId"<<std::endl;
+              ;}
     break;
 
   case 8:
-#line 47 "calendar.ypp"
+#line 218 "calendar.ypp"
     {
+              string _event_id = string((yyvsp[(3) - (4)].lexema));
+              (yyval.lexema) = new char[_event_id.length()+1];
+              strcpy((yyval.lexema), _event_id.c_str());
               std::cout << "--EventId"<<std::endl;
             ;}
     break;
 
   case 9:
-#line 51 "calendar.ypp"
+#line 225 "calendar.ypp"
     {
-            std::cout << "--Fecha"<<std::endl;
+            string res = string((yyvsp[(1) - (1)].lexema));
+            (yyval.time).lexema = new char[res.length()+1];
+            strcpy((yyval.time).lexema, res.c_str());
+            (yyval.time).type = 1;
+            std::cout << "--Fecha num"<<std::endl;            
           ;}
     break;
 
   case 10:
-#line 55 "calendar.ypp"
+#line 233 "calendar.ypp"
     {
-              std::cout << "--Fecha Hora"<<std::endl;
+            string s1 = string((yyvsp[(1) - (2)].lexema));
+            string s2 = string((yyvsp[(2) - (2)].lexema));
+            string res = s1 + " " + s2;
+            (yyval.time).lexema = new char[res.length()+1];
+            strcpy((yyval.time).lexema, res.c_str());
+            (yyval.time).type = 2;
+            std::cout << "--Fecha num Hora"<<std::endl;
           ;}
     break;
 
   case 11:
-#line 59 "calendar.ypp"
+#line 243 "calendar.ypp"
     {
-              std::cout << "--Mail repetido"<<std::endl;
-            ;}
+            string s1 = string((yyvsp[(1) - (2)].lexema));
+            string s2 = string((yyvsp[(2) - (2)].lexema));
+            string res = s1 + " " + s2;
+            (yyval.time).lexema = new char[res.length()+1];
+            strcpy((yyval.time).lexema, res.c_str());           
+            (yyval.time).type = 3;
+            std::cout << "--Fecha string Hora"<<std::endl;
+          ;}
     break;
 
   case 12:
-#line 63 "calendar.ypp"
+#line 253 "calendar.ypp"
     {
-              std::cout << "--Mail"<<std::endl;
-            ;}
+            string res = string((yyvsp[(1) - (1)].lexema));
+            (yyval.time).lexema = new char[res.length()+1];
+            strcpy((yyval.time).lexema, res.c_str());            
+            (yyval.time).type = 1;
+            std::cout << "--Fecha num"<<std::endl;            
+          ;}
     break;
 
   case 13:
-#line 67 "calendar.ypp"
+#line 261 "calendar.ypp"
     {
-              std::cout << "--Evento"<<std::endl;
+            string s1 = string((yyvsp[(1) - (2)].lexema));
+            string s2 = string((yyvsp[(2) - (2)].lexema));
+            string res = s1 + " " + s2;
+            (yyval.time).lexema = new char[res.length()+1];
+            strcpy((yyval.time).lexema, res.c_str());            
+            (yyval.time).type = 2;            
+            std::cout << "--Fecha num Hora"<<std::endl;             
           ;}
     break;
 
   case 14:
-#line 71 "calendar.ypp"
+#line 271 "calendar.ypp"
     {
-                    std::cout << "--Evento Búsqueda"<<std::endl;
-                  ;}
+            string s1 = string((yyvsp[(1) - (2)].lexema));
+            string s2 = string((yyvsp[(2) - (2)].lexema));
+            string res = s1 + " " + s2;
+            (yyval.time).lexema = new char[res.length()+1];
+            strcpy((yyval.time).lexema, res.c_str());           
+            (yyval.time).type = 3;            
+            std::cout << "--Fecha string Hora"<<std::endl;                                   
+          ;}
     break;
 
   case 15:
-#line 75 "calendar.ypp"
+#line 281 "calendar.ypp"
     {
-                std::cout << "--Calendario"<<std::endl;
-              ;}
+              string current = string((yyval.lexema));
+              current += string((yyvsp[(2) - (5)].lexema)) + ", ";
+              (yyval.lexema) = new char[current.length()+1];
+              strcpy((yyval.lexema), current.c_str());
+              std::cout << "--Mail repetido"<<std::endl; 
+            ;}
     break;
 
   case 16:
-#line 80 "calendar.ypp"
-    {
-              std::cout << "--InicioFin" << std::endl;
+#line 289 "calendar.ypp"
+    {                            
+              string current = "'"+string((yyvsp[(2) - (3)].lexema))+"'";
+              (yyval.lexema) = new char[current.length()+1];
+              strcpy((yyval.lexema), current.c_str());
+              std::cout << "--Mail"<<std::endl;    
             ;}
     break;
 
   case 17:
-#line 84 "calendar.ypp"
-    {
-                std::cout << "--(Optional search) nombre"<<std::endl;
-              ;}
+#line 296 "calendar.ypp"
+    {   
+            string _calendar_id = string((yyvsp[(3) - (6)].lexema));
+            string _nombre = string((yyvsp[(4) - (6)].paramsN)._nombre);
+            string _descripcion = string((yyvsp[(4) - (6)].paramsN)._descripcion);
+            DateTime _inicio = getDateFromString((yyvsp[(4) - (6)].paramsN)._inicio.lexema, (yyvsp[(4) - (6)].paramsN)._inicio.type);
+            DateTime _fin = getDateFromString((yyvsp[(4) - (6)].paramsN)._fin.lexema, (yyvsp[(4) - (6)].paramsN)._fin.type);                              
+            string _event_id = string((yyvsp[(4) - (6)].paramsN)._event_id);
+            ostringstream ss;            
+            ss << "var event"<< variableCounter["event"] << " = {          " << std::endl;
+            ss << "  'summary': "<< _nombre <<" ," << std::endl;
+            ss << "  'description': "<< _descripcion << "," << std::endl;
+            ss << "  'id': " << _event_id << "," << std::endl;
+            ss << "  'start': {" << std::endl;
+
+            if(_inicio.hasTime)
+            {
+              string actualTime = getTime(_inicio);
+              ss << "    'dateTime': '"<< _inicio.year << "-" << _inicio.month << "-" << _inicio.day << "T" << actualTime <<"'," << std::endl;
+            }
+            else
+            {
+              ss << "    'date': '"<< _inicio.year << "-" << _inicio.month << "-" << _inicio.day << "'," << std::endl;
+            }
+
+            if((yyvsp[(5) - (6)].paramsO)._zona != NULL && strlen((yyvsp[(5) - (6)].paramsO)._zona) != 0)
+            {
+              ss << "    'timeZone': '"<< string((yyvsp[(5) - (6)].paramsO)._zona) << "'" << std::endl;
+            }   
+            else
+            {
+              ss << "    'timeZone': 'America/Mexico_City'" << std::endl;
+            }         
+            ss << "  }," << std::endl;
+            ss << "  'end': {" << std::endl;
+            if(_fin.hasTime)
+            {
+              string actualTime = getTime(_fin);
+              ss << "    'dateTime': '"<< _fin.year << "-" << _fin.month << "-" << _fin.day << "T" << actualTime <<"'," << std::endl;
+            }
+            else
+            {
+              ss << "    'date': '"<< _fin.year << "-" << _fin.month << "-" << _fin.day << "'," << std::endl;
+            }            
+            if((yyvsp[(5) - (6)].paramsO)._zona != NULL && strlen((yyvsp[(5) - (6)].paramsO)._zona) != 0)
+            {
+              ss << "    'timeZone': '"<< string((yyvsp[(5) - (6)].paramsO)._zona) << "'" << std::endl;
+            }   
+            else
+            {
+              ss << "    'timeZone': 'America/Mexico_City'" << std::endl;
+            }  
+            ss << "  }";
+            ss << ",";
+            ss << "'reminders': {" << std::endl;
+            ss << "    'useDefault': false," << std::endl;
+            ss << "    'overrides': [" << std::endl;
+            ss << "      {'method': 'email', 'minutes': "<< (yyvsp[(4) - (6)].paramsN)._recordatorio <<"*60}," << std::endl;
+            ss << "    ]" << std::endl;
+            ss << "  }";              
+            if((yyvsp[(5) - (6)].paramsO)._invitados != NULL && strlen((yyvsp[(5) - (6)].paramsO)._invitados) != 0) 
+            {
+              string _invitados = string((yyvsp[(5) - (6)].paramsO)._invitados);
+              std::vector<std::string> mails;
+              if(_invitados.find(",") != std::string::npos)
+                mails = split(_invitados, ',');
+              else
+                mails.push_back(_invitados);
+              ss << "   ,";
+              ss << "'attendees': [" << std::endl;
+              for(int i = 0; i < mails.size(); i++)
+              { 
+                if(i+1 >= mails.size())
+                  ss << "    {'email': " << mails[i] << "}" << std::endl;
+                else
+                  ss << "    {'email': " << mails[i] << "}," << std::endl;
+              }
+              ss << "  ]" << std::endl;
+            } 
+            if((yyvsp[(5) - (6)].paramsO)._archivo != NULL && strlen((yyvsp[(5) - (6)].paramsO)._archivo) != 0) 
+            {
+              ss << "   ,";
+              ss << "'attachments':[" << std::endl;
+              ss << "    {'fileUrl': 'https://drive.google.com/file/d/0B8TFgB_0zcIIZEFpbENoaVBYNlE/view'}" << std::endl;
+            }                               
+            ss << "  ]" << std::endl;
+            ss << "};" << std::endl;
+
+            (yyval.event).lexema = new char[ss.str().length()+1];
+            strcpy((yyval.event).lexema, ss.str().c_str());            
+
+            (yyval.event)._calendar_id = new char[_calendar_id.length()+1];
+            strcpy((yyval.event)._calendar_id, _calendar_id.c_str());
+
+            (yyval.event)._event_id = new char[_event_id.length()+1];
+            strcpy((yyval.event)._event_id, _event_id.c_str());
+
+            std::cout << "--Evento"<<std::endl;
+            for(std::map<string, bool>::iterator it = parameterCounter.begin(); it != parameterCounter.end(); ++it)
+            {
+              it->second = false;
+            }
+          ;}
     break;
 
   case 18:
-#line 88 "calendar.ypp"
+#line 400 "calendar.ypp"
     {
-                std::cout << "--(Optional search) descripcion"<<std::endl;
+                string _nombre = string((yyvsp[(3) - (4)].paramsC)._nombre);
+                ostringstream ss;               
+                ss << " var resource"<< variableCounter["resource"] << " = {" << std::endl;
+                ss << "   \"summary\": "<< _nombre;
+                if((yyvsp[(3) - (4)].paramsC)._descripcion != NULL && strlen((yyvsp[(3) - (4)].paramsC)._descripcion) != 0)
+                {
+                  ss << "," << std::endl;
+                  ss << "   \"description\": "<<string((yyvsp[(3) - (4)].paramsC)._descripcion);
+                }            
+                ss << std::endl;    
+                ss << " };" << std::endl; 
+                (yyval.lexema) = new char[ss.str().length()+1];
+                strcpy((yyval.lexema), ss.str().c_str());
+                std::cout << "--Calendario"<<std::endl;
               ;}
     break;
 
   case 19:
-#line 92 "calendar.ypp"
+#line 423 "calendar.ypp"
     {
-                std::cout << "--(Optional search) Inicio y Fin"<<std::endl;
-              ;}
-    break;
+                if(isDateValid((yyvsp[(16) - (28)].time), (yyvsp[(22) - (28)].time)))
+                {
+                  string _nombre = string((yyvsp[(7) - (28)].lexema));
+                  string _descripcion = string((yyvsp[(11) - (28)].lexema));                                  
+                  YYSTYPE::dateTime _inicio = (yyvsp[(16) - (28)].time);
+                  YYSTYPE::dateTime _fin = (yyvsp[(22) - (28)].time);
+                  float _recordatorio = (yyvsp[(27) - (28)].valF);
 
-  case 20:
-#line 96 "calendar.ypp"
-    {
-                std::cout << "--Parametros search empty"<<std::endl;
-              ;}
-    break;
+                  (yyval.paramsN)._nombre = new char[_nombre.length()+1];
+                  strcpy((yyval.paramsN)._nombre, _nombre.c_str());
 
-  case 21:
-#line 104 "calendar.ypp"
-    {
+                  (yyval.paramsN)._descripcion = new char[_descripcion.length()+1];
+                  strcpy((yyval.paramsN)._descripcion, _descripcion.c_str());
+
+                  (yyval.paramsN)._inicio.lexema = new char[string(_inicio.lexema).length()+1];                  
+                  (yyval.paramsN)._inicio.type = _inicio.type;
+                  (yyval.paramsN)._inicio.lexema = _inicio.lexema;
+
+                  (yyval.paramsN)._fin.lexema = new char[string(_fin.lexema).length()+1];
+                  (yyval.paramsN)._fin.lexema = _fin.lexema;
+                  (yyval.paramsN)._fin.type = _fin.type;
+
+                  (yyval.paramsN)._recordatorio = _recordatorio;    
+                  string _event_id = string((yyvsp[(3) - (28)].lexema));   
+                  if(_event_id.length() >= 5 && _event_id.length() <= 1024)
+                  {
+                    (yyval.paramsN)._event_id = new char[_event_id.length()+1];
+                    strcpy((yyval.paramsN)._event_id, _event_id.c_str());
+                  } 
+                  else
+                  {
+                    std::cout << "'event id' debe ser de 5 a 1024 caracteres, de la a-v y de 0-9" << std::endl; 
+                    exit(-1);
+                  }
+                  std::cout << "--InicioFin" << std::endl;  
+                }   
+                else
+                {
+                  std::cout << "ERROR => tiempo con límites incorrectos" << std::endl;                
+                  exit(-1);
+                }   
                 std::cout << "--Parametros necesarios"<<std::endl;
               ;}
     break;
 
-  case 22:
-#line 108 "calendar.ypp"
+  case 20:
+#line 468 "calendar.ypp"
     {
+                  if(!parameterCounter["lugar"])
+                  {           
+                    string _lugar = string((yyvsp[(3) - (5)].lexema));                                                               
+
+                    (yyval.paramsO)._lugar = new char[_lugar.length()+1];
+                    strcpy((yyval.paramsO)._lugar, _lugar.c_str());
+
+                    if((yyvsp[(5) - (5)].paramsO)._archivo != NULL && strlen((yyvsp[(5) - (5)].paramsO)._archivo) != 0)
+                    {
+                      (yyval.paramsO)._archivo = new char[string((yyvsp[(5) - (5)].paramsO)._archivo).length()+1];
+                      (yyval.paramsO)._archivo = (yyvsp[(5) - (5)].paramsO)._archivo; 
+                    }
+
+                    if((yyvsp[(5) - (5)].paramsO)._zona != NULL && strlen((yyvsp[(5) - (5)].paramsO)._zona) != 0)
+                    {
+                      (yyval.paramsO)._zona = new char[string((yyvsp[(5) - (5)].paramsO)._zona).length()+1];
+                      (yyval.paramsO)._zona = (yyvsp[(5) - (5)].paramsO)._zona; 
+                    } 
+
+                    if((yyvsp[(5) - (5)].paramsO)._invitados != NULL && strlen((yyvsp[(5) - (5)].paramsO)._invitados) != 0)
+                    {
+                      (yyval.paramsO)._invitados = new char[string((yyvsp[(5) - (5)].paramsO)._invitados).length()+1];
+                      (yyval.paramsO)._invitados = (yyvsp[(5) - (5)].paramsO)._invitados;  
+                    }              
+
+                    parameterCounter["lugar"] = true;    
+                    std::cout << string((yyval.paramsO)._lugar) << std::endl;                                   
+                  }
+                  else
+                  {
+                    std::cout << "'Lugar' no puede ser definido dos veces" << std::endl;
+                    exit(-1);
+                  }
                   std::cout << "--(Opcional) lugar"<<std::endl;
                 ;}
     break;
 
-  case 23:
-#line 112 "calendar.ypp"
+  case 21:
+#line 505 "calendar.ypp"
     {
+                  if(!parameterCounter["archivo"])
+                  {       
+                    string _archivo = string((yyvsp[(3) - (5)].lexema));                     
+                    (yyval.paramsO)._archivo = new char[_archivo.length()+1];
+                    strcpy((yyval.paramsO)._archivo, _archivo.c_str());                       
+                    parameterCounter["archivo"] = true;    
+                    std::cout << string((yyval.paramsO)._archivo) << std::endl;
+
+                    if((yyvsp[(5) - (5)].paramsO)._lugar != NULL && strlen((yyvsp[(5) - (5)].paramsO)._lugar) != 0)
+                    {
+                      (yyval.paramsO)._lugar = new char[string((yyvsp[(5) - (5)].paramsO)._lugar).length()+1];
+                      (yyval.paramsO)._lugar = (yyvsp[(5) - (5)].paramsO)._lugar; 
+                    }
+
+                    if((yyvsp[(5) - (5)].paramsO)._zona != NULL && strlen((yyvsp[(5) - (5)].paramsO)._zona) != 0)
+                    {
+                      (yyval.paramsO)._zona = new char[string((yyvsp[(5) - (5)].paramsO)._zona).length()+1];
+                      (yyval.paramsO)._zona = (yyvsp[(5) - (5)].paramsO)._zona; 
+                    } 
+
+                    if((yyvsp[(5) - (5)].paramsO)._invitados != NULL && strlen((yyvsp[(5) - (5)].paramsO)._invitados) != 0)
+                    {
+                      (yyval.paramsO)._invitados = new char[string((yyvsp[(5) - (5)].paramsO)._invitados).length()+1];
+                      (yyval.paramsO)._invitados = (yyvsp[(5) - (5)].paramsO)._invitados;  
+                    }  
+                  }
+                  else
+                  {
+                    std::cout << "'Archivo' no puede ser definido dos veces" << std::endl;
+                    exit(-1);
+                  }
                   std::cout << "--(Opcional) archivo"<<std::endl;
                 ;}
     break;
 
-  case 24:
-#line 116 "calendar.ypp"
+  case 22:
+#line 540 "calendar.ypp"
     {
+                  if(!parameterCounter["invitados"])
+                  {   
+                    string _invitados = string((yyvsp[(3) - (5)].lexema));    
+                    (yyval.paramsO)._invitados = new char[_invitados.length()+1];
+                    strcpy((yyval.paramsO)._invitados, _invitados.c_str());     
+                     
+                    parameterCounter["invitados"] = true; 
+                    std::cout << string((yyval.paramsO)._invitados) << std::endl;
+
+                    if((yyvsp[(5) - (5)].paramsO)._archivo != NULL && strlen((yyvsp[(5) - (5)].paramsO)._archivo) != 0)
+                    {
+                      (yyval.paramsO)._archivo = new char[string((yyvsp[(5) - (5)].paramsO)._archivo).length()+1];
+                      (yyval.paramsO)._archivo = (yyvsp[(5) - (5)].paramsO)._archivo; 
+                    }
+
+                    if((yyvsp[(5) - (5)].paramsO)._zona != NULL && strlen((yyvsp[(5) - (5)].paramsO)._zona) != 0)
+                    {
+                      (yyval.paramsO)._zona = new char[string((yyvsp[(5) - (5)].paramsO)._zona).length()+1];
+                      (yyval.paramsO)._zona = (yyvsp[(5) - (5)].paramsO)._zona; 
+                    } 
+
+                    if((yyvsp[(5) - (5)].paramsO)._invitados != NULL && strlen((yyvsp[(5) - (5)].paramsO)._invitados) != 0)
+                    {
+                      (yyval.paramsO)._invitados = new char[string((yyvsp[(5) - (5)].paramsO)._invitados).length()+1];
+                      (yyval.paramsO)._invitados = (yyvsp[(5) - (5)].paramsO)._invitados;  
+                    }                
+                  }
+                  else
+                  {
+                    std::cout << "'Invitados' no puede ser definido dos veces" << std::endl;
+                    exit(-1);
+                  }
                   std::cout << "--(Opcional) invitados"<<std::endl;
                 ;}
     break;
 
-  case 25:
-#line 120 "calendar.ypp"
+  case 23:
+#line 576 "calendar.ypp"
     {
+                  if(!parameterCounter["zona"])
+                  {    
+                    string _zona = string((yyvsp[(4) - (7)].lexema));   
+                    (yyval.paramsO)._zona = new char[_zona.length()+1];
+                    strcpy((yyval.paramsO)._zona, _zona.c_str());                      
+                    parameterCounter["zona"] = true;      
+                    std::cout << string((yyval.paramsO)._zona) << std::endl; 
+
+                    if((yyvsp[(7) - (7)].paramsO)._archivo != NULL && strlen((yyvsp[(7) - (7)].paramsO)._archivo) != 0)
+                    {
+                      (yyval.paramsO)._archivo = new char[string((yyvsp[(7) - (7)].paramsO)._archivo).length()+1];
+                      (yyval.paramsO)._archivo = (yyvsp[(7) - (7)].paramsO)._archivo; 
+                    }                    
+                    if((yyvsp[(7) - (7)].paramsO)._zona != NULL && strlen((yyvsp[(7) - (7)].paramsO)._zona) != 0)
+                    {
+                      (yyval.paramsO)._zona = new char[string((yyvsp[(7) - (7)].paramsO)._zona).length()+1];
+                      (yyval.paramsO)._zona = (yyvsp[(7) - (7)].paramsO)._zona; 
+                    }
+
+                    if((yyvsp[(7) - (7)].paramsO)._invitados != NULL && strlen((yyvsp[(7) - (7)].paramsO)._invitados) != 0)
+                    {
+                      (yyval.paramsO)._invitados = new char[string((yyvsp[(7) - (7)].paramsO)._invitados).length()+1];
+                      (yyval.paramsO)._invitados = (yyvsp[(7) - (7)].paramsO)._invitados; 
+                    }            
+                  }
+                  else
+                  {
+                    std::cout << "'Zona' no puede ser definido dos veces" << std::endl;
+                    exit(-1);
+                  }
                   std::cout << "--(Opcional) zona"<<std::endl;
                 ;}
     break;
 
-  case 26:
-#line 124 "calendar.ypp"
-    {
+  case 24:
+#line 610 "calendar.ypp"
+    {               
                   std::cout << "--(Opcional) empty parms"<<std::endl;
                 ;}
     break;
 
-  case 27:
-#line 128 "calendar.ypp"
+  case 25:
+#line 615 "calendar.ypp"
     {
+                          string _nombre = string((yyvsp[(3) - (8)].lexema));
+                          string _descripcion = string((yyvsp[(7) - (8)].lexema));
+                          (yyval.paramsC)._nombre = new char[_nombre.length()+1];
+                          (yyval.paramsC)._descripcion = new char[_descripcion.length()+1];
+                          strcpy((yyval.paramsC)._nombre, _nombre.c_str());
+                          strcpy((yyval.paramsC)._descripcion, _descripcion.c_str());
                           std::cout << "--Params calendario: Nombre y descripción"<<std::endl;
                         ;}
     break;
 
-  case 28:
-#line 132 "calendar.ypp"
+  case 26:
+#line 625 "calendar.ypp"
     {
+                          string _nombre = string((yyvsp[(3) - (4)].lexema));                          
+                          (yyval.paramsC)._nombre = new char[_nombre.length()+1];                          
+                          strcpy((yyval.paramsC)._nombre, _nombre.c_str());                          
                           std::cout << "--Params calendario: Nombre"<<std::endl;
                         ;}
     break;
 
-  case 29:
-#line 136 "calendar.ypp"
+  case 27:
+#line 632 "calendar.ypp"
     {
-                std::cout << "--Consultar evento"<<std::endl;
-              ;}
-    break;
-
-  case 30:
-#line 140 "calendar.ypp"
-    {
+                file << "   " <<string((yyvsp[(2) - (2)].event).lexema) << std::endl;
+                file << "  var request"<< variableCounter["request"] <<" = gapi.client.calendar.events.update({" << std::endl;
+                file << "    'calendarId': " << string((yyvsp[(2) - (2)].event)._calendar_id) << "," << std::endl;
+                file << "    'eventId': " << string((yyvsp[(2) - (2)].event)._event_id) << std::endl;
+                file << "    'supportsAttachments': true," << std::endl;
+                file << "    'resource': event"<< variableCounter["event"] << std::endl;
+                file << "  });" << std::endl;
+                file << "  request"<< variableCounter["request"] <<".execute(function(event"<<variableCounter["event"]<<") {" << std::endl;
+                file << "    appendPre('Event updated: ' + event"<< variableCounter["event"] <<".htmlLink);" << std::endl;
+                file << "  });" << std::endl;
+                file << std::endl;
+                variableCounter["event"]++;
+                variableCounter["request"]++;
                 std::cout << "--Modificar evento"<<std::endl;
+                
+                
+                
               ;}
     break;
 
-  case 31:
-#line 144 "calendar.ypp"
-    {
+  case 28:
+#line 652 "calendar.ypp"
+    {    
+              file << " var request"<< variableCounter["request"] <<" = gapi.client.calendar.events.delete({" << std::endl;
+              file << "    'calendarId': "<< string((yyvsp[(4) - (6)].lexema)) <<"," << std::endl;
+              file << "    'eventId': "<< string((yyvsp[(5) - (6)].lexema)) << std::endl;
+              file << "  });" << std::endl;
+              file << std::endl;
+              file << "  request"<< variableCounter["request"] <<".execute(function(event) {" << std::endl;
+              file << "    appendPre('Event deleted');" << std::endl;
+              file << "  });" << std::endl;   
+              variableCounter["request"]++;       
               std::cout << "--Eliminar evento"<<std::endl;
+              
+              
             ;}
     break;
 
-  case 32:
-#line 148 "calendar.ypp"
-    {
+  case 29:
+#line 667 "calendar.ypp"
+    {          
+          file << "   " <<string((yyvsp[(2) - (2)].event).lexema) << std::endl;
+          file << "  var request"<< variableCounter["request"] <<" = gapi.client.calendar.events.insert({" << std::endl;
+          file << "    'calendarId': " << string((yyvsp[(2) - (2)].event)._calendar_id) << "," << std::endl;
+          file << "    'supportsAttachments': true," << std::endl;
+          file << "    'resource': event"<< variableCounter["event"] << std::endl;
+          file << "  });" << std::endl;
+          file << "  request"<< variableCounter["request"] <<".execute(function(event"<<variableCounter["event"]<<") {" << std::endl;
+          file << "    appendPre('Event created: ' + event"<< variableCounter["event"] <<".htmlLink);" << std::endl;
+          file << "  });" << std::endl;
+          file << std::endl;
+          variableCounter["event"]++;
+          variableCounter["request"]++;
           std::cout << "--Crear evento"<<std::endl;
+          
+          
         ;}
+    break;
+
+  case 30:
+#line 685 "calendar.ypp"
+    {
+          file << string((yyvsp[(2) - (2)].lexema)) << std::endl;
+          file << " gapi.client.calendar.calendars.insert(resource"<< variableCounter["resource"] <<").then(function(response"<< variableCounter["response"] <<"){" << std::endl;
+          file << "   appendPre(\"Calendario\"+ \" 'response"<< variableCounter["response"] <<".summary' \" + \"creado\");" << std::endl;
+          file << " });" << std::endl;
+          file << std::endl;
+          variableCounter["resource"]++;
+          variableCounter["response"]++;
+          std::cout << "--Crear calendario"<<std::endl;
+          
+        ;}
+    break;
+
+  case 31:
+#line 697 "calendar.ypp"
+    {                                     
+                if(hasDescripcion)
+                {
+                  (yyval.paramsB)._descripcion = new char[string((yyvsp[(5) - (5)].paramsB)._descripcion).length()+1];
+                  (yyval.paramsB)._descripcion = (yyvsp[(5) - (5)].paramsB)._descripcion;
+                } 
+
+                if(hasInicio)
+                {
+                  (yyval.paramsB)._inicio.lexema = new char[string((yyvsp[(5) - (5)].paramsB)._inicio.lexema).length()+1];
+                  (yyval.paramsB)._inicio.lexema = (yyvsp[(5) - (5)].paramsB)._inicio.lexema;
+                  (yyval.paramsB)._inicio.type = (yyvsp[(5) - (5)].paramsB)._inicio.type;
+                } 
+
+                if(hasFin)
+                {
+                  (yyval.paramsB)._fin.lexema = new char[string((yyvsp[(5) - (5)].paramsB)._fin.lexema).length()+1];
+                  (yyval.paramsB)._fin.lexema = (yyvsp[(5) - (5)].paramsB)._fin.lexema;
+                  (yyval.paramsB)._fin.type = (yyvsp[(5) - (5)].paramsB)._fin.type;
+                } 
+
+                std::cout << "--Optional search nombre" << std::endl;
+                string _nombre = string((yyvsp[(3) - (5)].lexema));
+                (yyval.paramsB)._nombre = new char[_nombre.length()+1];
+                strcpy((yyval.paramsB)._nombre, _nombre.c_str());
+                hasNombre = true;
+                std::cout << "NOMBRE " << string((yyval.paramsB)._nombre) << std::endl;
+              ;}
+    break;
+
+  case 32:
+#line 726 "calendar.ypp"
+    {     
+
+                string _descripcion = string((yyvsp[(3) - (5)].lexema));                     
+                (yyval.paramsB)._descripcion = new char[_descripcion.length()+1];
+                strcpy((yyval.paramsB)._descripcion, _descripcion.c_str());
+                std::cout << "DESC " << string((yyval.paramsB)._descripcion) << std::endl;
+                hasDescripcion = true;
+
+                if(hasNombre)
+                {
+                  (yyval.paramsB)._nombre = new char[string((yyvsp[(5) - (5)].paramsB)._nombre).length()+1];
+                  (yyval.paramsB)._nombre = (yyvsp[(5) - (5)].paramsB)._nombre;
+                } 
+
+                if(hasInicio)
+                {
+                  (yyval.paramsB)._inicio.lexema = new char[string((yyvsp[(5) - (5)].paramsB)._inicio.lexema).length()+1];
+                  (yyval.paramsB)._inicio.lexema = (yyvsp[(5) - (5)].paramsB)._inicio.lexema;
+                  (yyval.paramsB)._inicio.type = (yyvsp[(5) - (5)].paramsB)._inicio.type;
+                } 
+
+                if(hasFin)
+                {
+                  (yyval.paramsB)._fin.lexema = new char[string((yyvsp[(5) - (5)].paramsB)._fin.lexema).length()+1];
+                  (yyval.paramsB)._fin.lexema = (yyvsp[(5) - (5)].paramsB)._fin.lexema;
+                  (yyval.paramsB)._fin.type = (yyvsp[(5) - (5)].paramsB)._fin.type; 
+                }
+
+                std::cout << "--Optional search descripcion" << std::endl;
+              ;}
     break;
 
   case 33:
-#line 152 "calendar.ypp"
-    {
-          std::cout << "--Crear calendario"<<std::endl;
-        ;}
+#line 758 "calendar.ypp"
+    {                              
+                if(isDateValid((yyvsp[(4) - (13)].time), (yyvsp[(10) - (13)].time)))
+                {     
+                  string _inicio_string = string((yyvsp[(4) - (13)].time).lexema);                         
+                  string _fin_string = string((yyvsp[(10) - (13)].time).lexema); 
+
+                  (yyval.paramsB)._inicio.lexema = new char[_inicio_string.length()+1];                                  
+                  strcpy((yyval.paramsB)._inicio.lexema, _inicio_string.c_str());
+                  (yyval.paramsB)._inicio.type = (yyvsp[(4) - (13)].time).type;
+
+                  (yyval.paramsB)._fin.lexema = new char[_fin_string.length()+1];                                
+                  strcpy((yyval.paramsB)._fin.lexema, _fin_string.c_str());
+                  (yyval.paramsB)._fin.type = (yyvsp[(10) - (13)].time).type;
+
+                  hasInicio = true;
+                  hasFin = true;                     
+                  std::cout << "--InicioFin" << std::endl;
+
+                  if(hasNombre)
+                  {
+                    (yyval.paramsB)._nombre = new char[string((yyvsp[(13) - (13)].paramsB)._nombre).length()+1];
+                    (yyval.paramsB)._nombre = (yyvsp[(13) - (13)].paramsB)._nombre;
+                  } 
+
+                  if(hasDescripcion)
+                  {
+                    (yyval.paramsB)._descripcion = new char[string((yyvsp[(13) - (13)].paramsB)._descripcion).length()+1];
+                    (yyval.paramsB)._descripcion = (yyvsp[(13) - (13)].paramsB)._descripcion;
+                  }                 
+                  std::cout << "--Optional search Inicio y Fin" << std::endl;
+
+                  }                 
+                else
+                {
+                  std::cout << "ERROR => tiempo con límites incorrectos" << std::endl;                
+                  exit(-1);
+                }                                                
+              ;}
     break;
 
   case 34:
-#line 156 "calendar.ypp"
+#line 797 "calendar.ypp"
+    {   
+                std::cout << "--Empty search params" << std::endl;
+              ;}
+    break;
+
+  case 35:
+#line 801 "calendar.ypp"
+    {                             
+              std::cout << "BOOL NOMBRE: "<< hasNombre << std::endl;
+              std::cout << "BOOL DESC: "<< hasDescripcion << std::endl;
+              std::cout << "BOOL INICIO: "<< hasInicio << std::endl;
+              std::cout << "BOOL FIN: "<< hasFin << std::endl;
+              if(hasNombre)  
+                std::cout << "NOMBRE FUERA " << string((yyvsp[(5) - (6)].paramsB)._nombre) << std::endl;
+              if(hasDescripcion)  
+                std::cout << "DESC FUERA " << string((yyvsp[(5) - (6)].paramsB)._descripcion) << std::endl;
+              if(hasInicio)  
+                std::cout << "INICIO FUERA " << string((yyvsp[(5) - (6)].paramsB)._inicio.lexema) << std::endl;
+              if(hasFin)  
+                std::cout << "FIN FUERA " << string((yyvsp[(5) - (6)].paramsB)._fin.lexema) << std::endl;
+              std::cout << "--Consultar evento" << std::endl;
+            ;}
+    break;
+
+  case 36:
+#line 817 "calendar.ypp"
+    {
+                std::cout << "--Consultar funciones" << std::endl;
+              ;}
+    break;
+
+  case 37:
+#line 821 "calendar.ypp"
     {
                 std::cout << "--Crear funciones"<<std::endl;
               ;}
     break;
 
-  case 35:
-#line 160 "calendar.ypp"
-    {
-                std::cout << "--Consultar funciones"<<std::endl;
-              ;}
-    break;
-
-  case 36:
-#line 164 "calendar.ypp"
+  case 38:
+#line 825 "calendar.ypp"
     {
                 std::cout << "--Modificar funciones"<<std::endl;
               ;}
     break;
 
-  case 37:
-#line 168 "calendar.ypp"
+  case 39:
+#line 829 "calendar.ypp"
     {
                 std::cout << "--Eliminar funciones"<<std::endl;
               ;}
     break;
 
-  case 38:
-#line 172 "calendar.ypp"
+  case 40:
+#line 833 "calendar.ypp"
     {
                 std::cout << "--Funciones empty"<<std::endl;
               ;}
@@ -1771,7 +2434,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1775 "calendar.tab.cpp"
+#line 2438 "calendar.tab.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1985,9 +2648,278 @@ yyreturn:
 }
 
 
-#line 175 "calendar.ypp"
+#line 836 "calendar.ypp"
 
 //-- FUNCTION DEFINITIONS ---------------------------------
+
+void initMap(std::map<string, int> & map)
+{    
+  map["Enero"] = 1;
+  map["Febrero"] = 2;
+  map["Marzo"] = 3;
+  map["Abril"] = 4;
+  map["Mayo"] = 5;
+  map["Junio"] = 6;
+  map["Julio"] = 7;
+  map["Agosto"] = 8;
+  map["Septiembre"] = 9;
+  map["Octubre"] = 10;
+  map["Noviembre"] = 11;
+  map["Diciembre"] = 12;
+}
+
+int stringPos(string haystack, char needle, int nth)
+{// Will return position of n-th occurence of a char in a string.
+  string read;    // A string that will contain the read part of the haystack
+  for (int i=1 ; i<nth+1 ; ++i)
+  {
+    std::size_t found = haystack.find(needle);
+    read += haystack.substr(0,found+1); // the read part of the haystack is stocked in the read string
+    haystack.erase(0, found+1);     // remove the read part of the haystack up to the i-th needle
+    if (i == nth)
+    {
+      return read.size();
+    }
+  }
+  return -1;
+}
+
+bool isRealDate(DateTime date)
+{
+  //STUB
+  if(date.day <= 0 || date.day > 31)
+    return false;
+  if(date.month <= 0 || date.month > 12)
+    return false;
+  if(date.year <= 0)
+    return false;
+  return true;
+}
+
+std::ostream& operator << (std::ostream &o, const DateTime & date)
+{
+  o << "Day: " << date.day << std::endl;
+  o << "Month: " << date.month << std::endl;
+  o << "Year: " << date.year << std::endl;  
+  o << "Hours: " << date.hours << std::endl;
+  o << "Minutes: " << date.minutes << std::endl;
+  o << "Seconds: " << date.seconds << std::endl;  
+  o << "HasTime: " << date.hasTime << std::endl;
+  return o;
+}
+
+bool operator == (const DateTime & startDate, const DateTime & endDate)
+{
+  return startDate.day == endDate.day && startDate.month == endDate.month && startDate.year == endDate.year && startDate.hours == endDate.hours && startDate.minutes == endDate.minutes && startDate.seconds == endDate.seconds;
+}
+
+bool operator < (const DateTime & startDate, const DateTime & endDate)
+{ 
+  if(startDate == endDate)
+  {
+    return true;
+  }
+
+  if(startDate.year > endDate.year)
+  {  
+    return false;
+  }
+
+  if(startDate.month > endDate.month)
+  {
+    return false;
+  }
+
+  if(startDate.day > endDate.day)
+  { 
+    return false;
+  }
+
+  if(startDate.hours > endDate.hours)
+  {    
+    return false;
+  }
+
+  if (startDate.minutes > endDate.minutes)
+  {
+    return false;
+  }
+
+  if(startDate.seconds > endDate.seconds)
+  {
+    return false;
+  }
+  
+  return true;
+}
+
+bool isLogicalDate(DateTime startDate, DateTime endDate)
+{
+  // std::cout << "#############################" << std::endl;
+  // startDate < endDate ? std::cout << "menor" << std::endl : std::cout << "mayor" << std::endl;
+  return startDate < endDate;
+}
+
+DateTime getDateFromString(string date, int type)
+{    
+  struct DateTime res;
+  size_t found = date.find("/");
+  if(type == 1 || type == 2)
+  {
+    //fechanum
+    int FirstDash = stringPos(date, '/', 1);
+    int SecondDash = stringPos(date, '/', 2);
+    int day = stoi(date.substr(0,FirstDash));
+    int month = stoi(date.substr(FirstDash,SecondDash));
+    int year = stoi(date.substr(SecondDash));    
+    res.day = day;
+    res.month = month;
+    res.year = year;
+    res.hours = 0;
+    res.minutes = 0;
+    res.seconds = 0;
+    res.hasTime = false;    
+    if(type == 2)
+    {      
+      //fechanum hora            
+      int firstSpace = stringPos(date, ' ', 1);
+      int firstColon = stringPos(date, ':', 1);
+      int secondColon = stringPos(date, ':', 2);
+      int hours = stoi(date.substr(firstSpace, firstColon));
+      int minutes = stoi(date.substr(firstColon, secondColon));
+      int seconds = stoi(date.substr(secondColon));
+      res.hours = hours;
+      res.minutes = minutes;
+      res.seconds = seconds; 
+      res.hasTime = true;
+    }
+  }
+  else if(type == 3)
+  {
+    //fechastring  hora    
+    int firstSpace = stringPos(date, ' ', 1);
+    int secondSpace = stringPos(date, ' ', 2);    
+    int thirdSpace = stringPos(date, ' ', 3);    
+    int day = stoi(date.substr(0,firstSpace));     
+    int month = dateMap[date.substr(firstSpace, secondSpace-firstSpace-1)];
+    int year = stoi(date.substr(secondSpace, thirdSpace));    
+    res.day = day;
+    res.month = month;
+    res.year = year;    
+    int firstColon = stringPos(date, ':', 1);
+    int secondColon = stringPos(date, ':', 2);
+    int hours = stoi(date.substr(thirdSpace, firstColon));
+    int minutes = stoi(date.substr(firstColon, secondColon));
+    int seconds = stoi(date.substr(secondColon));
+    res.hours = hours;
+    res.minutes = minutes;
+    res.seconds = seconds; 
+    res.hasTime = true;
+  }
+  return res;
+}
+
+bool isDateValid(YYSTYPE::dateTime start_tok, YYSTYPE::dateTime end_tok)
+{  
+  string start = string(start_tok.lexema);  
+  string end = string(end_tok.lexema);     
+  size_t found = start.find("/");  
+  struct DateTime startDate = getDateFromString(start, start_tok.type);
+  struct DateTime endDate = getDateFromString(end, end_tok.type);  
+  if(isRealDate(startDate) && isRealDate(endDate))
+  {
+    if (isLogicalDate(startDate, endDate))
+    {
+      return true;
+    }
+    return false;
+  }
+  else
+  {
+    std::cout << "Fecha no válida" << std::endl;
+    return false;
+  }
+   
+   
+  return true;
+}
+
+void openFile(std::fstream & _file, std::string route)
+{
+  try
+  {
+    if (std::ofstream(route))
+    {            
+      _file.open(route, fstream::in | fstream::out);
+      if(_file.fail())
+      {
+        std::cout << "Error reading file... aborting" << std::endl;
+        throw 2;
+      }
+    }
+    else
+    {
+      std::cout << "File not found... Aborting" << std::endl;
+      throw 1;
+    }
+  }
+  catch (int e)
+  {
+    std::cerr << "Error reading data... Exception " << e << " caught" << std::endl;
+  }
+}
+
+void split(const std::string &s, char delim, std::vector<std::string> &elems) {
+    std::stringstream ss;
+    ss.str(s);
+    std::string item;
+    while (std::getline(ss, item, delim)) {
+        elems.push_back(item);
+    }
+}
+
+
+std::vector<std::string> split(std::string &s, char delim) {
+    std::vector<std::string> elems;
+    split(s, delim, elems);
+    return elems;
+}
+
+string getTime(DateTime date)
+{  
+  ostringstream _hours;
+  ostringstream _minutes;
+  ostringstream _seconds;
+  string resHours = "";
+  string resMinutes = "";
+  string resSeconds = "";
+  _hours << date.hours;
+  _minutes << date.minutes;
+  _seconds << date.seconds;
+
+  if(_hours.str().length() != 2)
+    resHours = "0"+_hours.str();
+  else
+    resHours = _hours.str();
+
+  if(_minutes.str().length() != 2)
+    resMinutes = "0"+_minutes.str();
+  else
+    resMinutes = _minutes.str();
+
+  if(_seconds.str().length() != 2)
+    resSeconds = "0"+_seconds.str();
+  else
+    resSeconds = _seconds.str();
+
+  return resHours + ":" + resMinutes + ":" + resSeconds;
+}
+
+void freeStr(char **str){
+    free( *str );
+    *str = NULL; 
+}
+
 int main( int argc, char **argv )
 {
     ++argv, --argc;     /* skip over program name */
@@ -1995,8 +2927,19 @@ int main( int argc, char **argv )
        yyin = fopen( argv[0], "r" );
     else
        yyin = stdin;
- 
-  yyparse();
+  parameterCounter["lugar"] = false;
+  parameterCounter["archivo"] = false;
+  parameterCounter["invitados"] = false;
+  parameterCounter["zona"] = false;
+  variableCounter["event"] = 1;
+  variableCounter["request"] = 1;
+  variableCounter["resource"] = 1;
+  variableCounter["response"] = 1;
+  initMap(dateMap);
+  openFile(file, "output.html");  
+  yyparse();  
+  
+  file.close();
   return 0;
 }
 

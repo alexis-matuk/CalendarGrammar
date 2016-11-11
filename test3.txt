@@ -1,30 +1,12 @@
 program 'nombre' {
-	declare user_id = 'qwertyuiop';
-	declare api_key = 'qwertyuiop';
+	declare user_id = '1031197866962-dclqkq813h9buc56on07l2rd2cje81rk.apps.googleusercontent.com';
+	declare api_key = 'AIzaSyCHiyDWn6pKd44YaytzmbcuOMasRaea-y0';
 	declare permissions = 'R & W';        	
-	crear calendario{
-    	nombre: 'mi primer calendario';
-    	descripcion: 'un calendario de prueba';
-	}
-
-	crear evento{
-		identifier: 'primary';
-		nombre: 'Proyecto Final';		
-		descripcion: 'Si no hacemos el proyecto, vamos a reprobar';
-		inicio: '23/09/2016';
-		fin: '24 Septiembre 2016 12:00:00';
-		recordatorio: 48;
-		invitados: 'alexis@example.com';
-		lugar: 'Tec Santa Fe';		
-		archivo: 'url=https://drive.google.com/file/d/0B8TFgB_0zcIIZEFpbENoaVBYNlE/view';				
-	}
 	 
 	consultar evento{
-		inicio:'12/09/2016';
-		fin:'16/09/2016';
-	}
-
-	consultar evento{
-		nombre: 'Dent';
+		nombre: 'myName';	
+		descripcion: 'myDesc';	
+		inicio: '23/09/2016';
+		fin: '25/09/2016';		
 	}
 }
