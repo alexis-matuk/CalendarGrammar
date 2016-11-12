@@ -28,6 +28,48 @@ function handleAuthResult(authResult) {
     }
 function callFunctions() {
 
+
+ function checkDates(json, lower, upper){
+   var item = JSON.parse(json);
+   if(item.date)
+   {
+     var queryDateLower = new Date(lower);
+     var queryDateUpper = new Date(upper);
+     var result = new Date(item.date);
+     if(result.getTime() >= queryDateLower.getTime() &&  result.getTime() <= queryDateUpper.getTime())
+     {
+       return true;
+     }
+   }
+   else if(item.dateTime)
+   {
+     var queryDateLower = new Date(lower);
+     var queryDateUpper = new Date(upper);
+     var result = new Date(item.date);
+     if(result.getTime() >= queryDateLower.getTime() &&  result.getTime() <= queryDateUpper.getTime())
+     {
+       return true;          
+     }
+   }
+ }
+
+ var query1 ={
+   'calendarId':  'primary'
+ };
+
+ var request1 = gapi.client.calendar.events.list(query1);
+ request1.execute(function(event) {
+   appendPre("Eventos encontrados con  y está entre 23/09/2016 y 25/12/2016");
+   for(var i = 0; i < event.items.length; i++)
+   {
+     var DateValid = checkDates(JSON.stringify(event.items[i].start), '2016-09-23', '2016-12-25');
+     if(DateValid)
+     {
+       appendPre(JSON.stringify(event.items[i], null, "\t"));
+     }
+   }
+ });
+
 }
 function handleAuthClick(event) {
       gapi.auth.authorize({

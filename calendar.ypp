@@ -99,6 +99,7 @@ bool hasNombre, hasDescripcion, hasInicio, hasFin = false;
   void split(const std::string &s, char delim, std::vector<std::string> &elems); 
   std::vector<std::string> split(std::string &s, char delim);
   string getTime(DateTime date);
+  string getDate(string date);
   void freeStr(char **str);
 %}
 //-- GRAMMAR RULES ---------------------------------------
@@ -493,7 +494,7 @@ bool hasNombre, hasDescripcion, hasInicio, hasFin = false;
                   }
                   else
                   {
-                    std::cout << "'Lugar' no puede ser definido dos veces" << std::endl;
+                    std::cout << "'Lugar' no puede ser definido más de una vez" << std::endl;
                     exit(-1);
                   }
                   std::cout << "--(Opcional) lugar"<<std::endl;
@@ -528,7 +529,7 @@ bool hasNombre, hasDescripcion, hasInicio, hasFin = false;
                   }
                   else
                   {
-                    std::cout << "'Archivo' no puede ser definido dos veces" << std::endl;
+                    std::cout << "'Archivo' no puede ser definido más de una vez" << std::endl;
                     exit(-1);
                   }
                   std::cout << "--(Opcional) archivo"<<std::endl;
@@ -564,7 +565,7 @@ bool hasNombre, hasDescripcion, hasInicio, hasFin = false;
                   }
                   else
                   {
-                    std::cout << "'Invitados' no puede ser definido dos veces" << std::endl;
+                    std::cout << "'Invitados' no puede ser definido más de una vez" << std::endl;
                     exit(-1);
                   }
                   std::cout << "--(Opcional) invitados"<<std::endl;
@@ -598,7 +599,7 @@ bool hasNombre, hasDescripcion, hasInicio, hasFin = false;
                   }
                   else
                   {
-                    std::cout << "'Zona' no puede ser definido dos veces" << std::endl;
+                    std::cout << "'Zona' no puede ser definido más de una vez" << std::endl;
                     exit(-1);
                   }
                   std::cout << "--(Opcional) zona"<<std::endl;
@@ -683,124 +684,271 @@ bool hasNombre, hasDescripcion, hasInicio, hasFin = false;
           std::cout << "--Crear calendario"<<std::endl;
         }
  PARAMETROSB: nombre DOSPUNTOS ALPHANUM PUNTOCOMA PARAMETROSB
-              {                                     
-                if(hasDescripcion)
+              {    
+                if(!parameterCounter["nombre_consulta"])   
                 {
-                  $$._descripcion = new char[string($5._descripcion).length()+1];
-                  $$._descripcion = $5._descripcion;
-                } 
+                  parameterCounter["nombre_consulta"] = true;
+                  if(hasDescripcion)
+                  {
+                    $$._descripcion = new char[string($5._descripcion).length()+1];
+                    $$._descripcion = $5._descripcion;
+                  } 
 
-                if(hasInicio)
+                  if(hasInicio)
+                  {
+                    $$._inicio.lexema = new char[string($5._inicio.lexema).length()+1];
+                    $$._inicio.lexema = $5._inicio.lexema;
+                    $$._inicio.type = $5._inicio.type;
+                  } 
+
+                  if(hasFin)
+                  {
+                    $$._fin.lexema = new char[string($5._fin.lexema).length()+1];
+                    $$._fin.lexema = $5._fin.lexema;
+                    $$._fin.type = $5._fin.type;
+                  } 
+
+                  std::cout << "--Optional search nombre" << std::endl;
+                  string _nombre = string($3);
+                  $$._nombre = new char[_nombre.length()+1];
+                  strcpy($$._nombre, _nombre.c_str());
+                  hasNombre = true;                  
+                }  
+                else
                 {
-                  $$._inicio.lexema = new char[string($5._inicio.lexema).length()+1];
-                  $$._inicio.lexema = $5._inicio.lexema;
-                  $$._inicio.type = $5._inicio.type;
-                } 
-
-                if(hasFin)
-                {
-                  $$._fin.lexema = new char[string($5._fin.lexema).length()+1];
-                  $$._fin.lexema = $5._fin.lexema;
-                  $$._fin.type = $5._fin.type;
-                } 
-
-                std::cout << "--Optional search nombre" << std::endl;
-                string _nombre = string($3);
-                $$._nombre = new char[_nombre.length()+1];
-                strcpy($$._nombre, _nombre.c_str());
-                hasNombre = true;
-                std::cout << "NOMBRE " << string($$._nombre) << std::endl;
+                  std::cout << "'nombre' no puede ser definido más de una vez" << std::endl;
+                  exit(-1);
+                }                                            
               }
               | descripcion DOSPUNTOS ALPHANUM PUNTOCOMA PARAMETROSB
               {     
-
-                string _descripcion = string($3);                     
-                $$._descripcion = new char[_descripcion.length()+1];
-                strcpy($$._descripcion, _descripcion.c_str());
-                std::cout << "DESC " << string($$._descripcion) << std::endl;
-                hasDescripcion = true;
-
-                if(hasNombre)
+                if(!parameterCounter["descripcion_consulta"])
                 {
-                  $$._nombre = new char[string($5._nombre).length()+1];
-                  $$._nombre = $5._nombre;
-                } 
-
-                if(hasInicio)
-                {
-                  $$._inicio.lexema = new char[string($5._inicio.lexema).length()+1];
-                  $$._inicio.lexema = $5._inicio.lexema;
-                  $$._inicio.type = $5._inicio.type;
-                } 
-
-                if(hasFin)
-                {
-                  $$._fin.lexema = new char[string($5._fin.lexema).length()+1];
-                  $$._fin.lexema = $5._fin.lexema;
-                  $$._fin.type = $5._fin.type; 
-                }
-
-                std::cout << "--Optional search descripcion" << std::endl;
-              }
-              | inicio DOSPUNTOS COMILLASIMPLE TIEMPOINICIO COMILLASIMPLE PUNTOCOMA
-                fin DOSPUNTOS COMILLASIMPLE TIEMPOFIN COMILLASIMPLE PUNTOCOMA PARAMETROSB
-              {                              
-                if(isDateValid($4, $10))
-                {     
-                  string _inicio_string = string($4.lexema);                         
-                  string _fin_string = string($10.lexema); 
-
-                  $$._inicio.lexema = new char[_inicio_string.length()+1];                                  
-                  strcpy($$._inicio.lexema, _inicio_string.c_str());
-                  $$._inicio.type = $4.type;
-
-                  $$._fin.lexema = new char[_fin_string.length()+1];                                
-                  strcpy($$._fin.lexema, _fin_string.c_str());
-                  $$._fin.type = $10.type;
-
-                  hasInicio = true;
-                  hasFin = true;                     
-                  std::cout << "--InicioFin" << std::endl;
+                  parameterCounter["descripcion_consulta"] = true;
+                  string _descripcion = string($3);                     
+                  $$._descripcion = new char[_descripcion.length()+1];
+                  strcpy($$._descripcion, _descripcion.c_str());                  
+                  hasDescripcion = true;
 
                   if(hasNombre)
                   {
-                    $$._nombre = new char[string($13._nombre).length()+1];
-                    $$._nombre = $13._nombre;
+                    $$._nombre = new char[string($5._nombre).length()+1];
+                    $$._nombre = $5._nombre;
                   } 
 
-                  if(hasDescripcion)
+                  if(hasInicio)
                   {
-                    $$._descripcion = new char[string($13._descripcion).length()+1];
-                    $$._descripcion = $13._descripcion;
-                  }                 
-                  std::cout << "--Optional search Inicio y Fin" << std::endl;
+                    $$._inicio.lexema = new char[string($5._inicio.lexema).length()+1];
+                    $$._inicio.lexema = $5._inicio.lexema;
+                    $$._inicio.type = $5._inicio.type;
+                  } 
 
-                  }                 
+                  if(hasFin)
+                  {
+                    $$._fin.lexema = new char[string($5._fin.lexema).length()+1];
+                    $$._fin.lexema = $5._fin.lexema;
+                    $$._fin.type = $5._fin.type; 
+                  }
+
+                  std::cout << "--Optional search descripcion" << std::endl;
+                } 
                 else
                 {
-                  std::cout << "ERROR => tiempo con límites incorrectos" << std::endl;                
+                  std::cout << "'descripcion' no puede ser definido más de una vez" << std::endl;
                   exit(-1);
-                }                                                
+                }               
+              }
+              | inicio DOSPUNTOS COMILLASIMPLE TIEMPOINICIO COMILLASIMPLE PUNTOCOMA
+                fin DOSPUNTOS COMILLASIMPLE TIEMPOFIN COMILLASIMPLE PUNTOCOMA PARAMETROSB
+              {   
+                if(!parameterCounter["fecha_consulta"])
+                {
+                  if(isDateValid($4, $10))
+                  {     
+                    string _inicio_string = string($4.lexema);                         
+                    string _fin_string = string($10.lexema); 
+
+                    $$._inicio.lexema = new char[_inicio_string.length()+1];                                  
+                    strcpy($$._inicio.lexema, _inicio_string.c_str());
+                    $$._inicio.type = $4.type;
+
+                    $$._fin.lexema = new char[_fin_string.length()+1];                                
+                    strcpy($$._fin.lexema, _fin_string.c_str());
+                    $$._fin.type = $10.type;
+
+                    hasInicio = true;
+                    hasFin = true;                     
+                    std::cout << "--InicioFin" << std::endl;
+
+                    if(hasNombre)
+                    {
+                      $$._nombre = new char[string($13._nombre).length()+1];
+                      $$._nombre = $13._nombre;
+                    } 
+
+                    if(hasDescripcion)
+                    {
+                      $$._descripcion = new char[string($13._descripcion).length()+1];
+                      $$._descripcion = $13._descripcion;
+                    }                 
+                    std::cout << "--Optional search Inicio y Fin" << std::endl;
+
+                    }                 
+                  else
+                  {
+                    std::cout << "ERROR => tiempo con límites incorrectos" << std::endl;                
+                    exit(-1);
+                  }   
+                } 
+                else
+                {
+                  std::cout << "'inicio' y 'fin' no pueden ser definidos más de una vez" << std::endl;
+                  exit(-1);
+                }                                                                                      
               }
               | /* empty */
               {   
                 std::cout << "--Empty search params" << std::endl;
               }
  CONSULTAR: consultar evento LLAVEABRE CALENDARID PARAMETROSB LLAVECIERRA
-            {                             
-              std::cout << "BOOL NOMBRE: "<< hasNombre << std::endl;
-              std::cout << "BOOL DESC: "<< hasDescripcion << std::endl;
-              std::cout << "BOOL INICIO: "<< hasInicio << std::endl;
-              std::cout << "BOOL FIN: "<< hasFin << std::endl;
-              if(hasNombre)  
-                std::cout << "NOMBRE FUERA " << string($5._nombre) << std::endl;
-              if(hasDescripcion)  
-                std::cout << "DESC FUERA " << string($5._descripcion) << std::endl;
-              if(hasInicio)  
-                std::cout << "INICIO FUERA " << string($5._inicio.lexema) << std::endl;
-              if(hasFin)  
-                std::cout << "FIN FUERA " << string($5._fin.lexema) << std::endl;
-              std::cout << "--Consultar evento" << std::endl;
+            {  
+              if(hasNombre || hasDescripcion || hasInicio || hasFin) 
+              {
+                if(hasInicio && hasFin)
+                {
+                  if(variableCounter["fecha_consulta"] == 0)
+                  {
+                    file << std::endl;
+                    file << " function checkDates(json, lower, upper){" << std::endl;
+                    file << "   var item = JSON.parse(json);" << std::endl;
+                    file << "   if(item.date)" << std::endl;
+                    file << "   {" << std::endl;
+                    file << "     var queryDateLower = new Date(lower);" << std::endl;
+                    file << "     var queryDateUpper = new Date(upper);" << std::endl;
+                    file << "     var result = new Date(item.date);" << std::endl;
+                    file << "     if(result.getTime() >= queryDateLower.getTime() &&  result.getTime() <= queryDateUpper.getTime())" << std::endl;
+                    file << "     {" << std::endl;
+                    file << "       return true;" << std::endl;
+                    file << "     }" << std::endl;
+                    file << "   }" << std::endl;
+                    file << "   else if(item.dateTime)" << std::endl;
+                    file << "   {" << std::endl;
+                    file << "     var queryDateLower = new Date(lower);" << std::endl;
+                    file << "     var queryDateUpper = new Date(upper);" << std::endl;
+                    file << "     var result = new Date(item.date);" << std::endl;
+                    file << "     if(result.getTime() >= queryDateLower.getTime() &&  result.getTime() <= queryDateUpper.getTime())" << std::endl;
+                    file << "     {" << std::endl;
+                    file << "       return true;          " << std::endl;
+                    file << "     }" << std::endl;
+                    file << "   }" << std::endl;
+                    file << " }" << std::endl;
+                    file << std::endl;
+                    variableCounter["fecha_consulta"]++;
+                  }
+                }
+
+                if(hasDescripcion)
+                {
+                  if(variableCounter["descripcion_consulta"] == 0)
+                  {
+                    file << "  function checkDescription(json, substr){" << std::endl;
+                    file << "   var item = JSON.parse(json); " << std::endl;
+                    file << "   if(item.hasOwnProperty(\"description\")) " << std::endl;
+                    file << "   {" << std::endl;
+                    file << "    if(item.description.indexOf(substr) !== -1) " << std::endl;
+                    file << "     {" << std::endl;
+                    file << "       return true; " << std::endl;
+                    file << "     }" << std::endl;
+                    file << "   }  " << std::endl;
+                    file << "   return false;  " << std::endl;
+                    file << " }" << std::endl;
+                    file << std::endl;
+
+                    variableCounter["descripcion_consulta"]++;
+                  }
+                }
+
+                if(hasNombre)
+                {
+                  if(variableCounter["nombre_consulta"] == 0)
+                  {
+                    file << " function checkName(json, substr){" << std::endl;
+                    file << "   var item = JSON.parse(json); " << std::endl;
+                    file << "   if(item.hasOwnProperty(\"summary\")) " << std::endl;
+                    file << "   {" << std::endl;
+                    file << "    if(item.summary.indexOf(substr) !== -1) " << std::endl;
+                    file << "     {" << std::endl;
+                    file << "       return true; " << std::endl;
+                    file << "     }" << std::endl;
+                    file << "   }  " << std::endl;
+                    file << " }" << std::endl;
+                    file << std::endl;
+                    variableCounter["nombre_consulta"]++;
+                  }
+                }              
+                file << " var query"<< variableCounter["query"] <<" ={" << std::endl;
+                file << "   'calendarId':  "<< string($4) << std::endl;
+                file << " };" << std::endl;
+                file << std::endl;
+                file << " var request"<< variableCounter["request"] <<" = gapi.client.calendar.events.list(query"<< variableCounter["query"] <<");" << std::endl;
+                file << " request"<< variableCounter["request"] <<".execute(function(event) {" << std::endl;
+
+                string res = "Eventos encontrados con ";
+                if(hasNombre)
+                  res += string($5._nombre) +" en su nombre";
+                if(hasDescripcion)
+                  res += " y " + string($5._descripcion) +" en su descricpión";
+                if(hasInicio && hasFin)
+                  res += " y está entre " + string($5._inicio.lexema)+ " y " + string($5._fin.lexema);
+
+                  file << "   appendPre(\""<< res <<"\");" << std::endl;
+                file << "   for(var i = 0; i < event.items.length; i++)" << std::endl;
+                file << "   {" << std::endl;
+                if(hasNombre)
+                  file << "     var NameValid = checkName(JSON.stringify(event.items[i]), "<< string($5._nombre) << ");" << std::endl;
+                if(hasDescripcion)
+                  file << "     var DescValid = checkDescription(JSON.stringify(event.items[i]), "<< string($5._descripcion) << ");" << std::endl;
+                if(hasInicio && hasFin)
+                {
+                  DateTime _inicio = getDateFromString($5._inicio.lexema, $5._inicio.type);
+                  DateTime _fin = getDateFromString($5._fin.lexema, $5._fin.type);
+
+                  ostringstream s_inicio, s_fin;
+                  s_inicio <<  _inicio.year << "-" << _inicio.month << "-" << _inicio.day;
+                  s_fin << _fin.year << "-" << _fin.month << "-" << _fin.day;
+
+                  string _inicio_format = getDate(s_inicio.str());
+                  string _fin_format = getDate(s_fin.str());
+
+                  file << "     var DateValid = checkDates(JSON.stringify(event.items[i].start), '"<< _inicio_format <<"', '"<< _fin_format <<"');" << std::endl;
+                }
+                string condition = "";
+                std::vector<string> conditions;
+                if(hasNombre)
+                  conditions.push_back("NameValid");
+                if(hasDescripcion)
+                  conditions.push_back("DescValid");
+                if(hasInicio && hasFin)
+                  conditions.push_back("DateValid");
+
+                for(int i = 0; i < conditions.size(); i++)
+                {
+                  if(i == 0)
+                    condition += conditions[i];
+                  else
+                    condition += " && " + conditions[i];
+                }
+                file << "     if("<< condition <<")" << std::endl;
+                file << "     {" << std::endl;
+                file << "       appendPre(JSON.stringify(event.items[i], null, \"\\t\"));" << std::endl;
+                file << "     }" << std::endl;
+                file << "   }" << std::endl;
+                file << " });" << std::endl;
+                file << std::endl;
+                variableCounter["query"]++;
+                variableCounter["request"]++;
+                std::cout << "--Consultar evento" << std::endl;
+              }                          
             }      
  FUNCIONES:   CONSULTAR FUNCIONES
               {
@@ -1058,6 +1206,33 @@ std::vector<std::string> split(std::string &s, char delim) {
     return elems;
 }
 
+string getDate(string date)
+{
+  int firstDash = stringPos(date, '-', 1);
+  int secondDash = stringPos(date, '-', 2);
+
+  string year = date.substr(0, firstDash-1);
+  string month = date.substr(firstDash, secondDash-firstDash-1);
+  string day = date.substr(secondDash);
+  string resDay, resMonth, resYear = "";
+
+  if(day.length() != 2)
+    resDay = "0"+day;
+  else
+    resDay = day;
+
+  if(month.length() != 2)
+    resMonth = "0"+month;
+  else
+    resMonth = month;
+
+  if(year.length() != 4)
+    resYear = "0"+year;
+  else
+    resYear = year;  
+  return resYear + "-" + resMonth + "-" + resDay;
+}
+
 string getTime(DateTime date)
 {  
   ostringstream _hours;
@@ -1104,10 +1279,19 @@ int main( int argc, char **argv )
   parameterCounter["archivo"] = false;
   parameterCounter["invitados"] = false;
   parameterCounter["zona"] = false;
+
+  parameterCounter["nombre_consulta"] = false;
+  parameterCounter["descripcion_consulta"] = false;
+  parameterCounter["fecha_consulta"] = false;
+
   variableCounter["event"] = 1;
   variableCounter["request"] = 1;
   variableCounter["resource"] = 1;
   variableCounter["response"] = 1;
+  variableCounter["query"] = 1;
+  variableCounter["nombre_consulta"] = 0;
+  variableCounter["descripcion_consulta"] = 0;
+  variableCounter["fecha_consulta"] = 0;  
   initMap(dateMap);
   openFile(file, "output.html");  
   yyparse();  

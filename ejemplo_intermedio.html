@@ -44,8 +44,8 @@
         calendar = "primary";
         // createEvent();
         // getEvent();
-        // getEventName();        
-        modifyEvent();
+        getEventName();        
+        // modifyEvent();
       }
 
       function createEvent(){
@@ -132,6 +132,57 @@
         var index = dateTime.indexOf("T");
         var substring = dateTime.substring(0,index);
         return substring;
+      }      
+
+      function deleteEvent(){
+        var request = gapi.client.calendar.events.delete({
+          'calendarId': calendar,
+          'eventId': 'elid2'          
+        });
+
+        request.execute(function(event) {
+          appendPre('Event delted: ' + event.htmlLink);
+        });
+      }
+
+      function checkDates(json, lower, upper){
+        var item = JSON.parse(json);
+        if(item.date)
+        {
+          var queryDateLower = new Date(lower);
+          var queryDateUpper = new Date(upper);
+          var result = new Date(item.date);
+          if(result.getTime() >= queryDateLower.getTime() &&  result.getTime() <= queryDateUpper.getTime())
+          {
+            return true;
+          }
+        }
+        else if(item.dateTime)
+        {
+          var queryDateLower = new Date(lower);
+          var queryDateUpper = new Date(upper);
+          var result = new Date(item.date);
+          if(result.getTime() >= queryDateLower.getTime() &&  result.getTime() <= queryDateUpper.getTime())
+          {
+            return true;          
+          }
+        }
+      }
+
+      function checkName(json, substr){
+        var item = JSON.parse(json);
+        if(item.summary.indexOf(substr) !== -1)
+        {
+          return true;
+        }
+      }
+
+      function checkDescription(json, substr){
+        var item = JSON.parse(json);
+        if(item.description.indexOf(substr) !== -1)
+        {
+          return true;
+        }
       }
 
       function getEventName(){
@@ -142,27 +193,15 @@
         var request = gapi.client.calendar.events.list(query);
 
         request.execute(function(event) {
-          console.log(event);
           appendPre("Eventos encontrados con 'Dent' en su nombre");
-          var substr = "Dent";
           for(var i = 0; i < event.items.length; i++)
           {
-            if(event.items[i].summary.indexOf(substr) !== -1)
+            var NameValid = checkName(JSON.stringify(event.items[i]), "Dent");
+            if(NameValid)
             {
-                appendPre(JSON.stringify(event.items[i], null, "\t"));
+              appendPre(JSON.stringify(event.items[i], null, "\t"));
             }
           }
-        });
-      }
-
-      function deleteEvent(){
-        var request = gapi.client.calendar.events.delete({
-          'calendarId': calendar,
-          'eventId': 'elid2'          
-        });
-
-        request.execute(function(event) {
-          appendPre('Event delted: ' + event.htmlLink);
         });
       }
 
@@ -178,26 +217,10 @@
           appendPre("Eventos encontrados de 12/09/2016 a 16/09/2016");
           for(var i = 0; i < event.items.length; i++)
           {
-            if(event.items[i].start.date)
+            var DateValid = checkDates(JSON.stringify(event.items[i].start), '2016-09-12', '2016-09-16');
+            if(DateValid)
             {
-              var queryDateLower = new Date('2016-09-12');
-              var queryDateUpper = new Date('2016-09-16');
-              var result = new Date(event.items[i].start.date);
-              if(result.getTime() >= queryDateLower.getTime() &&  result.getTime() <= queryDateUpper.getTime())
-              {
-                appendPre(JSON.stringify(event.items[i], null, "\t"));
-              }
-            }
-            else if(event.items[i].start.dateTime)
-            {
-              var queryDateLower = new Date('2016-09-12');
-              var queryDateUpper = new Date('2016-09-16');
-              var result = new Date(event.items[i].start.date);
-              if(result.getTime() >= queryDateLower.getTime() &&  result.getTime() <= queryDateUpper.getTime())
-              {
-                appendPre(JSON.stringify(event.items[i], null, "\t"));
-                
-              }
+              appendPre(JSON.stringify(event.items[i], null, "\t"));
             }
           }
         });

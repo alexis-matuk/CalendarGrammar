@@ -280,11 +280,12 @@ typedef union YYSTYPE
   void split(const std::string &s, char delim, std::vector<std::string> &elems); 
   std::vector<std::string> split(std::string &s, char delim);
   string getTime(DateTime date);
+  string getDate(string date);
   void freeStr(char **str);
 
 
 /* Line 216 of yacc.c.  */
-#line 288 "calendar.tab.cpp"
+#line 289 "calendar.tab.cpp"
 
 #ifdef short
 # undef short
@@ -594,11 +595,11 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,   106,   106,   141,   148,   155,   203,   211,   217,   224,
-     232,   242,   252,   260,   270,   280,   288,   295,   399,   417,
-     467,   504,   539,   575,   610,   613,   624,   631,   651,   666,
-     684,   696,   725,   756,   797,   800,   816,   820,   824,   828,
-     833
+       0,   107,   107,   142,   149,   156,   201,   209,   215,   222,
+     230,   240,   250,   258,   268,   278,   286,   293,   397,   415,
+     465,   502,   537,   573,   608,   611,   622,   629,   646,   659,
+     675,   686,   723,   761,   810,   813,   953,   957,   961,   965,
+     970
 };
 #endif
 
@@ -1597,7 +1598,7 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 107 "calendar.ypp"
+#line 108 "calendar.ypp"
     {        
     file << "}" << std::endl;
 
@@ -1635,7 +1636,7 @@ yyreduce:
     break;
 
   case 3:
-#line 142 "calendar.ypp"
+#line 143 "calendar.ypp"
     {      
                 string res = "R";  
                 (yyval.lexema) = new char[res.length()+1];
@@ -1645,7 +1646,7 @@ yyreduce:
     break;
 
   case 4:
-#line 149 "calendar.ypp"
+#line 150 "calendar.ypp"
     {  
                 string res = "R W";
                 (yyval.lexema) = new char[res.length()+1];
@@ -1655,7 +1656,7 @@ yyreduce:
     break;
 
   case 5:
-#line 158 "calendar.ypp"
+#line 159 "calendar.ypp"
     {
               string _user_id = string((yyvsp[(4) - (17)].lexema));
               string _api_key = string((yyvsp[(9) - (17)].lexema));              
@@ -1697,14 +1698,11 @@ yyreduce:
               file << std::endl;
               std::cout << "@@@@@@@@@@@" << std::endl;              
               std::cout << "--Declare Setup"<<std::endl;
-              
-              
-              
             ;}
     break;
 
   case 6:
-#line 204 "calendar.ypp"
+#line 202 "calendar.ypp"
     {
                 string res = string((yyvsp[(3) - (4)].lexema));
                 (yyval.lexema) = new char[res.length()+1];
@@ -1714,7 +1712,7 @@ yyreduce:
     break;
 
   case 7:
-#line 211 "calendar.ypp"
+#line 209 "calendar.ypp"
     {
                 string res = "'primary'";
                 (yyval.lexema) = new char[res.length()+1];
@@ -1724,7 +1722,7 @@ yyreduce:
     break;
 
   case 8:
-#line 218 "calendar.ypp"
+#line 216 "calendar.ypp"
     {
               string _event_id = string((yyvsp[(3) - (4)].lexema));
               (yyval.lexema) = new char[_event_id.length()+1];
@@ -1734,7 +1732,7 @@ yyreduce:
     break;
 
   case 9:
-#line 225 "calendar.ypp"
+#line 223 "calendar.ypp"
     {
             string res = string((yyvsp[(1) - (1)].lexema));
             (yyval.time).lexema = new char[res.length()+1];
@@ -1745,7 +1743,7 @@ yyreduce:
     break;
 
   case 10:
-#line 233 "calendar.ypp"
+#line 231 "calendar.ypp"
     {
             string s1 = string((yyvsp[(1) - (2)].lexema));
             string s2 = string((yyvsp[(2) - (2)].lexema));
@@ -1758,7 +1756,7 @@ yyreduce:
     break;
 
   case 11:
-#line 243 "calendar.ypp"
+#line 241 "calendar.ypp"
     {
             string s1 = string((yyvsp[(1) - (2)].lexema));
             string s2 = string((yyvsp[(2) - (2)].lexema));
@@ -1771,7 +1769,7 @@ yyreduce:
     break;
 
   case 12:
-#line 253 "calendar.ypp"
+#line 251 "calendar.ypp"
     {
             string res = string((yyvsp[(1) - (1)].lexema));
             (yyval.time).lexema = new char[res.length()+1];
@@ -1782,7 +1780,7 @@ yyreduce:
     break;
 
   case 13:
-#line 261 "calendar.ypp"
+#line 259 "calendar.ypp"
     {
             string s1 = string((yyvsp[(1) - (2)].lexema));
             string s2 = string((yyvsp[(2) - (2)].lexema));
@@ -1795,7 +1793,7 @@ yyreduce:
     break;
 
   case 14:
-#line 271 "calendar.ypp"
+#line 269 "calendar.ypp"
     {
             string s1 = string((yyvsp[(1) - (2)].lexema));
             string s2 = string((yyvsp[(2) - (2)].lexema));
@@ -1808,7 +1806,7 @@ yyreduce:
     break;
 
   case 15:
-#line 281 "calendar.ypp"
+#line 279 "calendar.ypp"
     {
               string current = string((yyval.lexema));
               current += string((yyvsp[(2) - (5)].lexema)) + ", ";
@@ -1819,7 +1817,7 @@ yyreduce:
     break;
 
   case 16:
-#line 289 "calendar.ypp"
+#line 287 "calendar.ypp"
     {                            
               string current = "'"+string((yyvsp[(2) - (3)].lexema))+"'";
               (yyval.lexema) = new char[current.length()+1];
@@ -1829,7 +1827,7 @@ yyreduce:
     break;
 
   case 17:
-#line 296 "calendar.ypp"
+#line 294 "calendar.ypp"
     {   
             string _calendar_id = string((yyvsp[(3) - (6)].lexema));
             string _nombre = string((yyvsp[(4) - (6)].paramsN)._nombre);
@@ -1935,7 +1933,7 @@ yyreduce:
     break;
 
   case 18:
-#line 400 "calendar.ypp"
+#line 398 "calendar.ypp"
     {
                 string _nombre = string((yyvsp[(3) - (4)].paramsC)._nombre);
                 ostringstream ss;               
@@ -1955,7 +1953,7 @@ yyreduce:
     break;
 
   case 19:
-#line 423 "calendar.ypp"
+#line 421 "calendar.ypp"
     {
                 if(isDateValid((yyvsp[(16) - (28)].time), (yyvsp[(22) - (28)].time)))
                 {
@@ -2003,7 +2001,7 @@ yyreduce:
     break;
 
   case 20:
-#line 468 "calendar.ypp"
+#line 466 "calendar.ypp"
     {
                   if(!parameterCounter["lugar"])
                   {           
@@ -2035,7 +2033,7 @@ yyreduce:
                   }
                   else
                   {
-                    std::cout << "'Lugar' no puede ser definido dos veces" << std::endl;
+                    std::cout << "'Lugar' no puede ser definido más de una vez" << std::endl;
                     exit(-1);
                   }
                   std::cout << "--(Opcional) lugar"<<std::endl;
@@ -2043,7 +2041,7 @@ yyreduce:
     break;
 
   case 21:
-#line 505 "calendar.ypp"
+#line 503 "calendar.ypp"
     {
                   if(!parameterCounter["archivo"])
                   {       
@@ -2073,7 +2071,7 @@ yyreduce:
                   }
                   else
                   {
-                    std::cout << "'Archivo' no puede ser definido dos veces" << std::endl;
+                    std::cout << "'Archivo' no puede ser definido más de una vez" << std::endl;
                     exit(-1);
                   }
                   std::cout << "--(Opcional) archivo"<<std::endl;
@@ -2081,7 +2079,7 @@ yyreduce:
     break;
 
   case 22:
-#line 540 "calendar.ypp"
+#line 538 "calendar.ypp"
     {
                   if(!parameterCounter["invitados"])
                   {   
@@ -2112,7 +2110,7 @@ yyreduce:
                   }
                   else
                   {
-                    std::cout << "'Invitados' no puede ser definido dos veces" << std::endl;
+                    std::cout << "'Invitados' no puede ser definido más de una vez" << std::endl;
                     exit(-1);
                   }
                   std::cout << "--(Opcional) invitados"<<std::endl;
@@ -2120,7 +2118,7 @@ yyreduce:
     break;
 
   case 23:
-#line 576 "calendar.ypp"
+#line 574 "calendar.ypp"
     {
                   if(!parameterCounter["zona"])
                   {    
@@ -2149,7 +2147,7 @@ yyreduce:
                   }
                   else
                   {
-                    std::cout << "'Zona' no puede ser definido dos veces" << std::endl;
+                    std::cout << "'Zona' no puede ser definido más de una vez" << std::endl;
                     exit(-1);
                   }
                   std::cout << "--(Opcional) zona"<<std::endl;
@@ -2157,14 +2155,14 @@ yyreduce:
     break;
 
   case 24:
-#line 610 "calendar.ypp"
+#line 608 "calendar.ypp"
     {               
                   std::cout << "--(Opcional) empty parms"<<std::endl;
                 ;}
     break;
 
   case 25:
-#line 615 "calendar.ypp"
+#line 613 "calendar.ypp"
     {
                           string _nombre = string((yyvsp[(3) - (8)].lexema));
                           string _descripcion = string((yyvsp[(7) - (8)].lexema));
@@ -2177,7 +2175,7 @@ yyreduce:
     break;
 
   case 26:
-#line 625 "calendar.ypp"
+#line 623 "calendar.ypp"
     {
                           string _nombre = string((yyvsp[(3) - (4)].lexema));                          
                           (yyval.paramsC)._nombre = new char[_nombre.length()+1];                          
@@ -2187,7 +2185,7 @@ yyreduce:
     break;
 
   case 27:
-#line 632 "calendar.ypp"
+#line 630 "calendar.ypp"
     {
                 file << "   " <<string((yyvsp[(2) - (2)].event).lexema) << std::endl;
                 file << "  var request"<< variableCounter["request"] <<" = gapi.client.calendar.events.update({" << std::endl;
@@ -2202,15 +2200,12 @@ yyreduce:
                 file << std::endl;
                 variableCounter["event"]++;
                 variableCounter["request"]++;
-                std::cout << "--Modificar evento"<<std::endl;
-                
-                
-                
+                std::cout << "--Modificar evento"<<std::endl; 
               ;}
     break;
 
   case 28:
-#line 652 "calendar.ypp"
+#line 647 "calendar.ypp"
     {    
               file << " var request"<< variableCounter["request"] <<" = gapi.client.calendar.events.delete({" << std::endl;
               file << "    'calendarId': "<< string((yyvsp[(4) - (6)].lexema)) <<"," << std::endl;
@@ -2222,13 +2217,11 @@ yyreduce:
               file << "  });" << std::endl;   
               variableCounter["request"]++;       
               std::cout << "--Eliminar evento"<<std::endl;
-              
-              
             ;}
     break;
 
   case 29:
-#line 667 "calendar.ypp"
+#line 660 "calendar.ypp"
     {          
           file << "   " <<string((yyvsp[(2) - (2)].event).lexema) << std::endl;
           file << "  var request"<< variableCounter["request"] <<" = gapi.client.calendar.events.insert({" << std::endl;
@@ -2242,14 +2235,12 @@ yyreduce:
           file << std::endl;
           variableCounter["event"]++;
           variableCounter["request"]++;
-          std::cout << "--Crear evento"<<std::endl;
-          
-          
+          std::cout << "--Crear evento"<<std::endl; 
         ;}
     break;
 
   case 30:
-#line 685 "calendar.ypp"
+#line 676 "calendar.ypp"
     {
           file << string((yyvsp[(2) - (2)].lexema)) << std::endl;
           file << " gapi.client.calendar.calendars.insert(resource"<< variableCounter["resource"] <<").then(function(response"<< variableCounter["response"] <<"){" << std::endl;
@@ -2259,174 +2250,320 @@ yyreduce:
           variableCounter["resource"]++;
           variableCounter["response"]++;
           std::cout << "--Crear calendario"<<std::endl;
-          
         ;}
     break;
 
   case 31:
-#line 697 "calendar.ypp"
-    {                                     
-                if(hasDescripcion)
+#line 687 "calendar.ypp"
+    {    
+                if(!parameterCounter["nombre_consulta"])   
                 {
-                  (yyval.paramsB)._descripcion = new char[string((yyvsp[(5) - (5)].paramsB)._descripcion).length()+1];
-                  (yyval.paramsB)._descripcion = (yyvsp[(5) - (5)].paramsB)._descripcion;
-                } 
+                  parameterCounter["nombre_consulta"] = true;
+                  if(hasDescripcion)
+                  {
+                    (yyval.paramsB)._descripcion = new char[string((yyvsp[(5) - (5)].paramsB)._descripcion).length()+1];
+                    (yyval.paramsB)._descripcion = (yyvsp[(5) - (5)].paramsB)._descripcion;
+                  } 
 
-                if(hasInicio)
+                  if(hasInicio)
+                  {
+                    (yyval.paramsB)._inicio.lexema = new char[string((yyvsp[(5) - (5)].paramsB)._inicio.lexema).length()+1];
+                    (yyval.paramsB)._inicio.lexema = (yyvsp[(5) - (5)].paramsB)._inicio.lexema;
+                    (yyval.paramsB)._inicio.type = (yyvsp[(5) - (5)].paramsB)._inicio.type;
+                  } 
+
+                  if(hasFin)
+                  {
+                    (yyval.paramsB)._fin.lexema = new char[string((yyvsp[(5) - (5)].paramsB)._fin.lexema).length()+1];
+                    (yyval.paramsB)._fin.lexema = (yyvsp[(5) - (5)].paramsB)._fin.lexema;
+                    (yyval.paramsB)._fin.type = (yyvsp[(5) - (5)].paramsB)._fin.type;
+                  } 
+
+                  std::cout << "--Optional search nombre" << std::endl;
+                  string _nombre = string((yyvsp[(3) - (5)].lexema));
+                  (yyval.paramsB)._nombre = new char[_nombre.length()+1];
+                  strcpy((yyval.paramsB)._nombre, _nombre.c_str());
+                  hasNombre = true;                  
+                }  
+                else
                 {
-                  (yyval.paramsB)._inicio.lexema = new char[string((yyvsp[(5) - (5)].paramsB)._inicio.lexema).length()+1];
-                  (yyval.paramsB)._inicio.lexema = (yyvsp[(5) - (5)].paramsB)._inicio.lexema;
-                  (yyval.paramsB)._inicio.type = (yyvsp[(5) - (5)].paramsB)._inicio.type;
-                } 
-
-                if(hasFin)
-                {
-                  (yyval.paramsB)._fin.lexema = new char[string((yyvsp[(5) - (5)].paramsB)._fin.lexema).length()+1];
-                  (yyval.paramsB)._fin.lexema = (yyvsp[(5) - (5)].paramsB)._fin.lexema;
-                  (yyval.paramsB)._fin.type = (yyvsp[(5) - (5)].paramsB)._fin.type;
-                } 
-
-                std::cout << "--Optional search nombre" << std::endl;
-                string _nombre = string((yyvsp[(3) - (5)].lexema));
-                (yyval.paramsB)._nombre = new char[_nombre.length()+1];
-                strcpy((yyval.paramsB)._nombre, _nombre.c_str());
-                hasNombre = true;
-                std::cout << "NOMBRE " << string((yyval.paramsB)._nombre) << std::endl;
+                  std::cout << "'nombre' no puede ser definido más de una vez" << std::endl;
+                  exit(-1);
+                }                                            
               ;}
     break;
 
   case 32:
-#line 726 "calendar.ypp"
+#line 724 "calendar.ypp"
     {     
-
-                string _descripcion = string((yyvsp[(3) - (5)].lexema));                     
-                (yyval.paramsB)._descripcion = new char[_descripcion.length()+1];
-                strcpy((yyval.paramsB)._descripcion, _descripcion.c_str());
-                std::cout << "DESC " << string((yyval.paramsB)._descripcion) << std::endl;
-                hasDescripcion = true;
-
-                if(hasNombre)
+                if(!parameterCounter["descripcion_consulta"])
                 {
-                  (yyval.paramsB)._nombre = new char[string((yyvsp[(5) - (5)].paramsB)._nombre).length()+1];
-                  (yyval.paramsB)._nombre = (yyvsp[(5) - (5)].paramsB)._nombre;
+                  parameterCounter["descripcion_consulta"] = true;
+                  string _descripcion = string((yyvsp[(3) - (5)].lexema));                     
+                  (yyval.paramsB)._descripcion = new char[_descripcion.length()+1];
+                  strcpy((yyval.paramsB)._descripcion, _descripcion.c_str());                  
+                  hasDescripcion = true;
+
+                  if(hasNombre)
+                  {
+                    (yyval.paramsB)._nombre = new char[string((yyvsp[(5) - (5)].paramsB)._nombre).length()+1];
+                    (yyval.paramsB)._nombre = (yyvsp[(5) - (5)].paramsB)._nombre;
+                  } 
+
+                  if(hasInicio)
+                  {
+                    (yyval.paramsB)._inicio.lexema = new char[string((yyvsp[(5) - (5)].paramsB)._inicio.lexema).length()+1];
+                    (yyval.paramsB)._inicio.lexema = (yyvsp[(5) - (5)].paramsB)._inicio.lexema;
+                    (yyval.paramsB)._inicio.type = (yyvsp[(5) - (5)].paramsB)._inicio.type;
+                  } 
+
+                  if(hasFin)
+                  {
+                    (yyval.paramsB)._fin.lexema = new char[string((yyvsp[(5) - (5)].paramsB)._fin.lexema).length()+1];
+                    (yyval.paramsB)._fin.lexema = (yyvsp[(5) - (5)].paramsB)._fin.lexema;
+                    (yyval.paramsB)._fin.type = (yyvsp[(5) - (5)].paramsB)._fin.type; 
+                  }
+
+                  std::cout << "--Optional search descripcion" << std::endl;
                 } 
-
-                if(hasInicio)
+                else
                 {
-                  (yyval.paramsB)._inicio.lexema = new char[string((yyvsp[(5) - (5)].paramsB)._inicio.lexema).length()+1];
-                  (yyval.paramsB)._inicio.lexema = (yyvsp[(5) - (5)].paramsB)._inicio.lexema;
-                  (yyval.paramsB)._inicio.type = (yyvsp[(5) - (5)].paramsB)._inicio.type;
-                } 
-
-                if(hasFin)
-                {
-                  (yyval.paramsB)._fin.lexema = new char[string((yyvsp[(5) - (5)].paramsB)._fin.lexema).length()+1];
-                  (yyval.paramsB)._fin.lexema = (yyvsp[(5) - (5)].paramsB)._fin.lexema;
-                  (yyval.paramsB)._fin.type = (yyvsp[(5) - (5)].paramsB)._fin.type; 
-                }
-
-                std::cout << "--Optional search descripcion" << std::endl;
+                  std::cout << "'descripcion' no puede ser definido más de una vez" << std::endl;
+                  exit(-1);
+                }               
               ;}
     break;
 
   case 33:
-#line 758 "calendar.ypp"
-    {                              
-                if(isDateValid((yyvsp[(4) - (13)].time), (yyvsp[(10) - (13)].time)))
-                {     
-                  string _inicio_string = string((yyvsp[(4) - (13)].time).lexema);                         
-                  string _fin_string = string((yyvsp[(10) - (13)].time).lexema); 
+#line 763 "calendar.ypp"
+    {   
+                if(!parameterCounter["fecha_consulta"])
+                {
+                  if(isDateValid((yyvsp[(4) - (13)].time), (yyvsp[(10) - (13)].time)))
+                  {     
+                    string _inicio_string = string((yyvsp[(4) - (13)].time).lexema);                         
+                    string _fin_string = string((yyvsp[(10) - (13)].time).lexema); 
 
-                  (yyval.paramsB)._inicio.lexema = new char[_inicio_string.length()+1];                                  
-                  strcpy((yyval.paramsB)._inicio.lexema, _inicio_string.c_str());
-                  (yyval.paramsB)._inicio.type = (yyvsp[(4) - (13)].time).type;
+                    (yyval.paramsB)._inicio.lexema = new char[_inicio_string.length()+1];                                  
+                    strcpy((yyval.paramsB)._inicio.lexema, _inicio_string.c_str());
+                    (yyval.paramsB)._inicio.type = (yyvsp[(4) - (13)].time).type;
 
-                  (yyval.paramsB)._fin.lexema = new char[_fin_string.length()+1];                                
-                  strcpy((yyval.paramsB)._fin.lexema, _fin_string.c_str());
-                  (yyval.paramsB)._fin.type = (yyvsp[(10) - (13)].time).type;
+                    (yyval.paramsB)._fin.lexema = new char[_fin_string.length()+1];                                
+                    strcpy((yyval.paramsB)._fin.lexema, _fin_string.c_str());
+                    (yyval.paramsB)._fin.type = (yyvsp[(10) - (13)].time).type;
 
-                  hasInicio = true;
-                  hasFin = true;                     
-                  std::cout << "--InicioFin" << std::endl;
+                    hasInicio = true;
+                    hasFin = true;                     
+                    std::cout << "--InicioFin" << std::endl;
 
-                  if(hasNombre)
+                    if(hasNombre)
+                    {
+                      (yyval.paramsB)._nombre = new char[string((yyvsp[(13) - (13)].paramsB)._nombre).length()+1];
+                      (yyval.paramsB)._nombre = (yyvsp[(13) - (13)].paramsB)._nombre;
+                    } 
+
+                    if(hasDescripcion)
+                    {
+                      (yyval.paramsB)._descripcion = new char[string((yyvsp[(13) - (13)].paramsB)._descripcion).length()+1];
+                      (yyval.paramsB)._descripcion = (yyvsp[(13) - (13)].paramsB)._descripcion;
+                    }                 
+                    std::cout << "--Optional search Inicio y Fin" << std::endl;
+
+                    }                 
+                  else
                   {
-                    (yyval.paramsB)._nombre = new char[string((yyvsp[(13) - (13)].paramsB)._nombre).length()+1];
-                    (yyval.paramsB)._nombre = (yyvsp[(13) - (13)].paramsB)._nombre;
-                  } 
-
-                  if(hasDescripcion)
-                  {
-                    (yyval.paramsB)._descripcion = new char[string((yyvsp[(13) - (13)].paramsB)._descripcion).length()+1];
-                    (yyval.paramsB)._descripcion = (yyvsp[(13) - (13)].paramsB)._descripcion;
-                  }                 
-                  std::cout << "--Optional search Inicio y Fin" << std::endl;
-
-                  }                 
+                    std::cout << "ERROR => tiempo con límites incorrectos" << std::endl;                
+                    exit(-1);
+                  }   
+                } 
                 else
                 {
-                  std::cout << "ERROR => tiempo con límites incorrectos" << std::endl;                
+                  std::cout << "'inicio' y 'fin' no pueden ser definidos más de una vez" << std::endl;
                   exit(-1);
-                }                                                
+                }                                                                                      
               ;}
     break;
 
   case 34:
-#line 797 "calendar.ypp"
+#line 810 "calendar.ypp"
     {   
                 std::cout << "--Empty search params" << std::endl;
               ;}
     break;
 
   case 35:
-#line 801 "calendar.ypp"
-    {                             
-              std::cout << "BOOL NOMBRE: "<< hasNombre << std::endl;
-              std::cout << "BOOL DESC: "<< hasDescripcion << std::endl;
-              std::cout << "BOOL INICIO: "<< hasInicio << std::endl;
-              std::cout << "BOOL FIN: "<< hasFin << std::endl;
-              if(hasNombre)  
-                std::cout << "NOMBRE FUERA " << string((yyvsp[(5) - (6)].paramsB)._nombre) << std::endl;
-              if(hasDescripcion)  
-                std::cout << "DESC FUERA " << string((yyvsp[(5) - (6)].paramsB)._descripcion) << std::endl;
-              if(hasInicio)  
-                std::cout << "INICIO FUERA " << string((yyvsp[(5) - (6)].paramsB)._inicio.lexema) << std::endl;
-              if(hasFin)  
-                std::cout << "FIN FUERA " << string((yyvsp[(5) - (6)].paramsB)._fin.lexema) << std::endl;
-              std::cout << "--Consultar evento" << std::endl;
+#line 814 "calendar.ypp"
+    {  
+              if(hasNombre || hasDescripcion || hasInicio || hasFin) 
+              {
+                if(hasInicio && hasFin)
+                {
+                  if(variableCounter["fecha_consulta"] == 0)
+                  {
+                    file << std::endl;
+                    file << " function checkDates(json, lower, upper){" << std::endl;
+                    file << "   var item = JSON.parse(json);" << std::endl;
+                    file << "   if(item.date)" << std::endl;
+                    file << "   {" << std::endl;
+                    file << "     var queryDateLower = new Date(lower);" << std::endl;
+                    file << "     var queryDateUpper = new Date(upper);" << std::endl;
+                    file << "     var result = new Date(item.date);" << std::endl;
+                    file << "     if(result.getTime() >= queryDateLower.getTime() &&  result.getTime() <= queryDateUpper.getTime())" << std::endl;
+                    file << "     {" << std::endl;
+                    file << "       return true;" << std::endl;
+                    file << "     }" << std::endl;
+                    file << "   }" << std::endl;
+                    file << "   else if(item.dateTime)" << std::endl;
+                    file << "   {" << std::endl;
+                    file << "     var queryDateLower = new Date(lower);" << std::endl;
+                    file << "     var queryDateUpper = new Date(upper);" << std::endl;
+                    file << "     var result = new Date(item.date);" << std::endl;
+                    file << "     if(result.getTime() >= queryDateLower.getTime() &&  result.getTime() <= queryDateUpper.getTime())" << std::endl;
+                    file << "     {" << std::endl;
+                    file << "       return true;          " << std::endl;
+                    file << "     }" << std::endl;
+                    file << "   }" << std::endl;
+                    file << " }" << std::endl;
+                    file << std::endl;
+                    variableCounter["fecha_consulta"]++;
+                  }
+                }
+
+                if(hasDescripcion)
+                {
+                  if(variableCounter["descripcion_consulta"] == 0)
+                  {
+                    file << "  function checkDescription(json, substr){" << std::endl;
+                    file << "   var item = JSON.parse(json); " << std::endl;
+                    file << "   if(item.hasOwnProperty(\"description\")) " << std::endl;
+                    file << "   {" << std::endl;
+                    file << "    if(item.description.indexOf(substr) !== -1) " << std::endl;
+                    file << "     {" << std::endl;
+                    file << "       return true; " << std::endl;
+                    file << "     }" << std::endl;
+                    file << "   }  " << std::endl;
+                    file << "   return false;  " << std::endl;
+                    file << " }" << std::endl;
+                    file << std::endl;
+
+                    variableCounter["descripcion_consulta"]++;
+                  }
+                }
+
+                if(hasNombre)
+                {
+                  if(variableCounter["nombre_consulta"] == 0)
+                  {
+                    file << " function checkName(json, substr){" << std::endl;
+                    file << "   var item = JSON.parse(json); " << std::endl;
+                    file << "   if(item.hasOwnProperty(\"summary\")) " << std::endl;
+                    file << "   {" << std::endl;
+                    file << "    if(item.summary.indexOf(substr) !== -1) " << std::endl;
+                    file << "     {" << std::endl;
+                    file << "       return true; " << std::endl;
+                    file << "     }" << std::endl;
+                    file << "   }  " << std::endl;
+                    file << " }" << std::endl;
+                    file << std::endl;
+                    variableCounter["nombre_consulta"]++;
+                  }
+                }              
+                file << " var query"<< variableCounter["query"] <<" ={" << std::endl;
+                file << "   'calendarId':  "<< string((yyvsp[(4) - (6)].lexema)) << std::endl;
+                file << " };" << std::endl;
+                file << std::endl;
+                file << " var request"<< variableCounter["request"] <<" = gapi.client.calendar.events.list(query"<< variableCounter["query"] <<");" << std::endl;
+                file << " request"<< variableCounter["request"] <<".execute(function(event) {" << std::endl;
+
+                string res = "Eventos encontrados con ";
+                if(hasNombre)
+                  res += string((yyvsp[(5) - (6)].paramsB)._nombre) +" en su nombre";
+                if(hasDescripcion)
+                  res += " y " + string((yyvsp[(5) - (6)].paramsB)._descripcion) +" en su descricpión";
+                if(hasInicio && hasFin)
+                  res += " y está entre " + string((yyvsp[(5) - (6)].paramsB)._inicio.lexema)+ " y " + string((yyvsp[(5) - (6)].paramsB)._fin.lexema);
+
+                  file << "   appendPre(\""<< res <<"\");" << std::endl;
+                file << "   for(var i = 0; i < event.items.length; i++)" << std::endl;
+                file << "   {" << std::endl;
+                if(hasNombre)
+                  file << "     var NameValid = checkName(JSON.stringify(event.items[i]), "<< string((yyvsp[(5) - (6)].paramsB)._nombre) << ");" << std::endl;
+                if(hasDescripcion)
+                  file << "     var DescValid = checkDescription(JSON.stringify(event.items[i]), "<< string((yyvsp[(5) - (6)].paramsB)._descripcion) << ");" << std::endl;
+                if(hasInicio && hasFin)
+                {
+                  DateTime _inicio = getDateFromString((yyvsp[(5) - (6)].paramsB)._inicio.lexema, (yyvsp[(5) - (6)].paramsB)._inicio.type);
+                  DateTime _fin = getDateFromString((yyvsp[(5) - (6)].paramsB)._fin.lexema, (yyvsp[(5) - (6)].paramsB)._fin.type);
+
+                  ostringstream s_inicio, s_fin;
+                  s_inicio <<  _inicio.year << "-" << _inicio.month << "-" << _inicio.day;
+                  s_fin << _fin.year << "-" << _fin.month << "-" << _fin.day;
+
+                  string _inicio_format = getDate(s_inicio.str());
+                  string _fin_format = getDate(s_fin.str());
+
+                  file << "     var DateValid = checkDates(JSON.stringify(event.items[i].start), '"<< _inicio_format <<"', '"<< _fin_format <<"');" << std::endl;
+                }
+                string condition = "";
+                std::vector<string> conditions;
+                if(hasNombre)
+                  conditions.push_back("NameValid");
+                if(hasDescripcion)
+                  conditions.push_back("DescValid");
+                if(hasInicio && hasFin)
+                  conditions.push_back("DateValid");
+
+                for(int i = 0; i < conditions.size(); i++)
+                {
+                  if(i == 0)
+                    condition += conditions[i];
+                  else
+                    condition += " && " + conditions[i];
+                }
+                file << "     if("<< condition <<")" << std::endl;
+                file << "     {" << std::endl;
+                file << "       appendPre(JSON.stringify(event.items[i], null, \"\\t\"));" << std::endl;
+                file << "     }" << std::endl;
+                file << "   }" << std::endl;
+                file << " });" << std::endl;
+                file << std::endl;
+                variableCounter["query"]++;
+                variableCounter["request"]++;
+                std::cout << "--Consultar evento" << std::endl;
+              }                          
             ;}
     break;
 
   case 36:
-#line 817 "calendar.ypp"
+#line 954 "calendar.ypp"
     {
                 std::cout << "--Consultar funciones" << std::endl;
               ;}
     break;
 
   case 37:
-#line 821 "calendar.ypp"
+#line 958 "calendar.ypp"
     {
                 std::cout << "--Crear funciones"<<std::endl;
               ;}
     break;
 
   case 38:
-#line 825 "calendar.ypp"
+#line 962 "calendar.ypp"
     {
                 std::cout << "--Modificar funciones"<<std::endl;
               ;}
     break;
 
   case 39:
-#line 829 "calendar.ypp"
+#line 966 "calendar.ypp"
     {
                 std::cout << "--Eliminar funciones"<<std::endl;
               ;}
     break;
 
   case 40:
-#line 833 "calendar.ypp"
+#line 970 "calendar.ypp"
     {
                 std::cout << "--Funciones empty"<<std::endl;
               ;}
@@ -2434,7 +2571,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 2438 "calendar.tab.cpp"
+#line 2575 "calendar.tab.cpp"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2648,7 +2785,7 @@ yyreturn:
 }
 
 
-#line 836 "calendar.ypp"
+#line 973 "calendar.ypp"
 
 //-- FUNCTION DEFINITIONS ---------------------------------
 
@@ -2885,6 +3022,33 @@ std::vector<std::string> split(std::string &s, char delim) {
     return elems;
 }
 
+string getDate(string date)
+{
+  int firstDash = stringPos(date, '-', 1);
+  int secondDash = stringPos(date, '-', 2);
+
+  string year = date.substr(0, firstDash-1);
+  string month = date.substr(firstDash, secondDash-firstDash-1);
+  string day = date.substr(secondDash);
+  string resDay, resMonth, resYear = "";
+
+  if(day.length() != 2)
+    resDay = "0"+day;
+  else
+    resDay = day;
+
+  if(month.length() != 2)
+    resMonth = "0"+month;
+  else
+    resMonth = month;
+
+  if(year.length() != 4)
+    resYear = "0"+year;
+  else
+    resYear = year;  
+  return resYear + "-" + resMonth + "-" + resDay;
+}
+
 string getTime(DateTime date)
 {  
   ostringstream _hours;
@@ -2931,10 +3095,19 @@ int main( int argc, char **argv )
   parameterCounter["archivo"] = false;
   parameterCounter["invitados"] = false;
   parameterCounter["zona"] = false;
+
+  parameterCounter["nombre_consulta"] = false;
+  parameterCounter["descripcion_consulta"] = false;
+  parameterCounter["fecha_consulta"] = false;
+
   variableCounter["event"] = 1;
   variableCounter["request"] = 1;
   variableCounter["resource"] = 1;
   variableCounter["response"] = 1;
+  variableCounter["query"] = 1;
+  variableCounter["nombre_consulta"] = 0;
+  variableCounter["descripcion_consulta"] = 0;
+  variableCounter["fecha_consulta"] = 0;  
   initMap(dateMap);
   openFile(file, "output.html");  
   yyparse();  

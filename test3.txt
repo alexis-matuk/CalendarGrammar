@@ -2,11 +2,48 @@ program 'nombre' {
 	declare user_id = '1031197866962-dclqkq813h9buc56on07l2rd2cje81rk.apps.googleusercontent.com';
 	declare api_key = 'AIzaSyCHiyDWn6pKd44YaytzmbcuOMasRaea-y0';
 	declare permissions = 'R & W';        	
-	 
-	consultar evento{
-		nombre: 'myName';	
-		descripcion: 'myDesc';	
+	crear calendario{
+    	nombre: 'mi primer calendario';
+    	descripcion: 'un calendario de prueba';
+	}
+
+	crear evento{
+		calendar_id: 'primary';
+		event_id: "12345";
+		nombre: 'Nuestro Proyecto Final';		
+		descripcion: 'Si no hacemos el proyecto, vamos a reprobar';
 		inicio: '23/09/2016';
-		fin: '25/09/2016';		
+		fin: '24 Septiembre 2016 12:00:00';
+		recordatorio: 48;
+		lugar: 'Tec Santa Fe';
+		archivo: 'url=https://drive.google.com/file/d/0B8TFgB_0zcIIZEFpbENoaVBYNlE/view';		
+		invitados: 'alexis@example.com';
+		zona: 'America/Mexico_City';
+	}
+
+	modificar evento{
+		calendar_id: 'primary';
+		event_id: "12345";
+		nombre: 'El Super Proyecto Final';		
+		descripcion: 'Si no hacemos el proyecto, vamos a reprobar';
+		inicio: '23/09/2016';
+		fin: '24 Septiembre 2016 12:00:00';
+		recordatorio: 48;
+		lugar: 'Tec Santa Fe';
+		archivo: 'url=https://drive.google.com/file/d/0B8TFgB_0zcIIZEFpbENoaVBYNlE/view';		
+		invitados: 'alexis@example.com';
+		zona: 'America/Mexico_City';
+	}
+
+	eliminar evento{
+		calendar_id: 'primary';
+		event_id: "12345";
+	}
+	 
+	consultar evento{			
+		inicio: '23/09/2016';
+		fin: '25/09/2016';
+		nombre: 'myName';
+		descripcion: 'myDesc';	
 	}
 }
